@@ -1,0 +1,858 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>AI Risks &amp; Ethics: Challenges &amp; Frameworks</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet"/>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --blue:        #1a56db;
+  --blue-light:  #e8f0fe;
+  --blue-dark:   #1e3a8a;
+  --green:       #057a55;
+  --green-light: #def7ec;
+  --yellow:      #c27803;
+  --yellow-light:#fdf6b2;
+  --orange:      #c2500a;
+  --purple:      #7c3aed;
+  --purple-light:#ede9fe;
+  --red:         #dc2626;
+  --red-light:   #fee2e2;
+  --gray-50:     #f9fafb;
+  --gray-100:    #f3f4f6;
+  --gray-200:    #e5e7eb;
+  --gray-400:    #9ca3af;
+  --gray-600:    #4b5563;
+  --gray-700:    #374151;
+  --gray-800:    #1f2937;
+  --gray-900:    #111827;
+  --radius:      8px;
+}
+
+body {
+  font-family: 'Inter', sans-serif;
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--gray-800);
+  background: var(--gray-50);
+}
+
+/* ── SITE HEADER ── */
+.site-header {
+  background: white;
+  border-bottom: 1px solid var(--gray-200);
+  padding: 12px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 1px 3px rgba(0,0,0,.06);
+}
+.site-header .course-name { font-size: 13px; font-weight: 600; color: var(--gray-600); }
+.site-header .course-name a { color: var(--blue); text-decoration: none; }
+.site-header .course-name a:hover { text-decoration: underline; }
+.site-header .inst { font-size: 12px; color: var(--gray-400); }
+.site-header .inst a { color: var(--gray-400); text-decoration: none; }
+.site-header .inst a:hover { text-decoration: underline; color: var(--gray-600); }
+
+/* ── HERO ── */
+.hero {
+  background: linear-gradient(135deg, #1e3a8a 0%, #1a56db 60%, #2563eb 100%);
+  color: white;
+  padding: 48px 24px 40px;
+  text-align: center;
+}
+.hero h1 { font-size: clamp(22px, 4vw, 30px); font-weight: 700; margin-bottom: 8px; }
+.hero .subtitle { font-size: 15px; opacity: .75; margin-bottom: 24px; }
+.badges { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-bottom: 20px; }
+.badge { background: rgba(255,255,255,.18); border: 1px solid rgba(255,255,255,.3); border-radius: 999px; padding: 4px 14px; font-size: 13px; font-weight: 500; }
+.credit { font-size: 12px; opacity: .55; }
+.credit a { color: white; }
+
+/* ── STICKY TAB BAR ── */
+.tabs-bar {
+  background: white;
+  border-bottom: 2px solid var(--gray-200);
+  display: flex;
+  overflow-x: auto;
+  scrollbar-width: none;
+  position: sticky;
+  top: 45px;
+  z-index: 99;
+  justify-content: center;
+}
+.tabs-bar::-webkit-scrollbar { display: none; }
+.tab-btn {
+  padding: 14px 18px; font-size: 13px; font-weight: 600; color: var(--gray-600);
+  border: none; background: none; cursor: pointer; white-space: nowrap;
+  border-bottom: 2px solid transparent; margin-bottom: -2px;
+  transition: color .15s, border-color .15s; font-family: 'Inter', sans-serif;
+}
+.tab-btn:hover { color: var(--blue); }
+.tab-btn.active { color: var(--blue); border-bottom-color: var(--blue); }
+
+/* ── PANELS ── */
+.tab-panel { display: none; }
+.tab-panel.active { display: block; }
+.container { max-width: 900px; margin: 0 auto; padding: 32px 20px 80px; }
+
+/* ── SECTION HEADINGS ── */
+.section-label {
+  font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase;
+  color: var(--gray-600); margin: 28px 0 10px; padding-bottom: 8px;
+  border-bottom: 1px solid var(--gray-200);
+}
+.section-intro { font-size: 14px; color: var(--gray-600); margin-bottom: 20px; line-height: 1.7; }
+
+/* ── ACCORDION ── */
+.accordion { border: 1px solid #b2dce8; border-radius: var(--radius); margin-bottom: 10px; background: white; overflow: hidden; }
+.accordion summary {
+  padding: 14px 18px; font-weight: 600; font-size: 14px; cursor: pointer;
+  display: flex; align-items: center; gap: 8px; list-style: none;
+  user-select: none; background: #e8f6f9; color: #1a4a56;
+}
+.accordion summary::-webkit-details-marker { display: none; }
+.accordion summary::after { content: '▾'; margin-left: auto; font-size: 12px; color: #4a8fa0; transition: transform .2s; }
+.accordion[open] summary::after { transform: rotate(180deg); }
+.accordion summary:hover { background: #d4eef4; }
+.accordion-body { padding: 0 18px 18px; border-top: 1px solid #b2dce8; font-size: 14px; color: var(--gray-700); }
+.accordion-body p { margin-top: 10px; }
+
+/* ── CALLOUTS ── */
+.callout { border-radius: var(--radius); padding: 12px 16px; margin: 14px 0; font-size: 13.5px; display: flex; gap: 10px; }
+.callout.info    { background: var(--blue-light);    border-left: 3px solid var(--blue);   color: #1e3a8a; }
+.callout.warn    { background: var(--yellow-light);  border-left: 3px solid var(--yellow); color: #78350f; }
+.callout.success { background: var(--green-light);   border-left: 3px solid var(--green);  color: #064e3b; }
+.callout.tip     { background: #e8f6f9; border-left: 3px solid #4a8fa0; color: #1a4a56; }
+.callout.error   { background: var(--red-light);     border-left: 3px solid var(--red);    color: #7f1d1d; }
+
+/* ── FLASHCARDS ── */
+.flash-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  margin: 16px 0;
+}
+@media (max-width: 600px) {
+  .flash-grid { grid-template-columns: 1fr; }
+}
+.flash-wrapper {
+}
+.flash-card {
+  width: 100%;
+  cursor: pointer;
+}
+.flash-front, .flash-back {
+  border-radius: var(--radius);
+  padding: 24px 20px;
+  border: 1px solid var(--gray-200);
+}
+.flash-front {
+  background: white;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  min-height: 180px;
+  transition: box-shadow .2s;
+}
+.flash-front:hover { box-shadow: 0 4px 12px rgba(0,0,0,.08); }
+.flash-card.flipped .flash-front { display: none; }
+.flash-front .flash-icon { font-size: 36px; margin-bottom: 12px; }
+.flash-front h3 { font-size: 16px; font-weight: 700; color: var(--gray-800); margin-bottom: 6px; }
+.flash-front .flash-hint { font-size: 12px; color: var(--gray-400); margin-top: 8px; }
+.flash-front.hallucination { border-top: 4px solid var(--red); }
+.flash-front.bias { border-top: 4px solid var(--yellow); }
+.flash-front.environment { border-top: 4px solid var(--orange); }
+.flash-front.copyright { border-top: 4px solid var(--purple); }
+.flash-back {
+  background: var(--gray-50);
+  display: none;
+  transition: box-shadow .2s;
+}
+.flash-back:hover { box-shadow: 0 4px 12px rgba(0,0,0,.08); }
+.flash-card.flipped .flash-back { display: block; }
+.flash-back h4 { font-size: 13px; font-weight: 700; color: var(--gray-800); margin-bottom: 6px; }
+.flash-back p { font-size: 13px; color: var(--gray-600); line-height: 1.6; }
+.flash-back .flash-example {
+  margin-top: 10px;
+  background: white;
+  border: 1px solid var(--gray-200);
+  border-radius: 6px;
+  padding: 8px 10px;
+  font-size: 12px;
+  color: var(--gray-700);
+  line-height: 1.5;
+}
+.flash-back .flash-tap { font-size: 12px; color: var(--gray-400); margin-top: 10px; text-align: right; }
+.flash-back.hallucination { border-top: 4px solid var(--red); }
+.flash-back.bias { border-top: 4px solid var(--yellow); }
+.flash-back.environment { border-top: 4px solid var(--orange); }
+.flash-back.copyright { border-top: 4px solid var(--purple); }
+
+/* ── PRINCIPLE CHIPS ── */
+.principle-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 10px;
+}
+.principle-chip {
+  font-size: 12px;
+  font-weight: 600;
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: var(--green-light);
+  color: #064e3b;
+  border: 1px solid #a7f3d0;
+}
+
+/* ── QUIZ ── */
+.quiz-question {
+  background: white;
+  border: 1px solid var(--gray-200);
+  border-radius: var(--radius);
+  padding: 20px;
+  margin-bottom: 16px;
+}
+.quiz-question h3 { font-size: 14px; font-weight: 600; color: var(--gray-800); margin-bottom: 12px; }
+.quiz-options { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+@media (max-width: 500px) { .quiz-options { grid-template-columns: 1fr; } }
+.quiz-option {
+  padding: 10px 14px; border: 2px solid var(--gray-200); border-radius: var(--radius);
+  background: white; cursor: pointer; font-size: 13px; font-family: 'Inter', sans-serif;
+  color: var(--gray-700); transition: border-color .15s, background .15s; text-align: left;
+}
+.quiz-option:hover { border-color: var(--blue); background: var(--blue-light); }
+.quiz-option.correct { border-color: var(--green); background: var(--green-light); color: #064e3b; }
+.quiz-option.incorrect { border-color: var(--red); background: var(--red-light); color: #7f1d1d; }
+.quiz-option.disabled { pointer-events: none; opacity: 0.7; }
+.quiz-feedback { margin-top: 10px; font-size: 13px; padding: 8px 12px; border-radius: 6px; display: none; }
+.quiz-feedback.show { display: block; }
+.quiz-feedback.correct-fb { background: var(--green-light); color: #064e3b; border-left: 3px solid var(--green); }
+.quiz-feedback.incorrect-fb { background: var(--red-light); color: #7f1d1d; border-left: 3px solid var(--red); }
+.quiz-score { background: white; border: 1px solid var(--gray-200); border-radius: var(--radius); padding: 20px; text-align: center; margin-top: 20px; }
+.quiz-score .score-number { font-size: 28px; font-weight: 700; color: var(--blue); }
+.quiz-score .score-label { font-size: 13px; color: var(--gray-600); }
+.reset-btn {
+  display: inline-block; margin-top: 12px; padding: 8px 20px; background: var(--blue);
+  color: white; border: none; border-radius: var(--radius); font-size: 13px; font-weight: 600;
+  font-family: 'Inter', sans-serif; cursor: pointer; transition: background .15s;
+}
+.reset-btn:hover { background: var(--blue-dark); }
+
+/* ── SHAKE ── */
+@keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-6px); } 75% { transform: translateX(6px); } }
+.shake { animation: shake .35s ease both; }
+
+/* ── SOURCE LINK ── */
+.source-link { display: inline-block; margin-top: 8px; font-size: 13px; color: var(--blue); }
+
+/* ── BACK TO TOP ── */
+.back-top { display: inline-block; margin-top: 24px; font-size: 13px; color: var(--blue); cursor: pointer; }
+a { color: var(--blue); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+/* ── FOOTER ── */
+.page-footer { text-align: center; padding: 24px; font-size: 12px; color: var(--gray-400); border-top: 1px solid var(--gray-200); margin-top: 40px; }
+.page-footer a { color: var(--gray-600); text-decoration: none; }
+.page-footer a:hover { text-decoration: underline; }
+
+/* ── BALANCE DIAGRAM ── */
+.balance-diagram {
+  text-align: center;
+  margin: 20px 0;
+  padding: 24px;
+  background: white;
+  border: 1px solid var(--gray-200);
+  border-radius: var(--radius);
+}
+.balance-label {
+  display: inline-block;
+  background: var(--yellow-light);
+  border: 1px solid #f6d860;
+  color: #78350f;
+  font-weight: 700;
+  font-size: 13px;
+  padding: 8px 20px;
+  border-radius: 999px;
+  margin-bottom: 16px;
+}
+.balance-cols {
+  display: flex;
+  justify-content: center;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+.balance-box {
+  border: 2px solid var(--gray-200);
+  border-radius: var(--radius);
+  padding: 14px 20px;
+  min-width: 180px;
+  max-width: 260px;
+  background: var(--gray-50);
+}
+.balance-box h4 { font-size: 13px; font-weight: 700; color: var(--gray-800); margin-bottom: 2px; }
+.balance-box p { font-size: 12px; color: var(--gray-600); }
+.balance-box.risks { border-color: var(--red); }
+.balance-box.ethics { border-color: var(--green); }
+.balance-arrow { font-size: 24px; color: var(--yellow); display: flex; align-items: center; }
+
+/* ── ASIMOV LAWS ── */
+.laws-list {
+  margin-top: 10px;
+  padding-left: 0;
+  list-style: none;
+  counter-reset: law;
+}
+.laws-list li {
+  counter-increment: law;
+  font-size: 13px;
+  color: var(--gray-700);
+  padding: 6px 0 6px 32px;
+  position: relative;
+  line-height: 1.5;
+}
+.laws-list li::before {
+  content: counter(law);
+  position: absolute;
+  left: 0;
+  top: 6px;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--blue);
+  color: white;
+  font-size: 11px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+/* ── NAV BAR ── */
+.site-header { flex-wrap: wrap; gap: 8px; }
+.site-nav { display: flex; gap: 4px; align-items: center; }
+.site-nav a {
+  font-size: 12px; font-weight: 500; color: var(--gray-600);
+  padding: 4px 10px; border-radius: 999px; text-decoration: none;
+  transition: background .15s, color .15s; white-space: nowrap;
+}
+.site-nav a:hover { background: var(--blue-light); color: var(--blue); text-decoration: none; }
+.site-nav a.current { background: var(--blue); color: white; pointer-events: none; }
+.nav-sep { color: var(--gray-200); font-size: 14px; user-select: none; }
+</style>
+</head>
+<body>
+
+<!-- SITE HEADER -->
+<header class="site-header">
+  <div>
+    <div class="course-name">English &amp; AI &nbsp;·&nbsp; <a href="https://www.linkedin.com/in/hagu1/" target="_blank">Hamid Guedra</a></div>
+    <div class="inst"><a href="https://lab.fi/en" target="_blank">LAB University of Applied Sciences</a></div>
+  </div>
+  <nav class="site-nav">
+    <a href="index.html">🏠 Home</a>
+    <a href="ai-history-concepts-metaphors.html">History &amp; Concepts</a>
+    <a href="ai-risks-ethics.html" class="current">Risks &amp; Ethics</a>
+    <a href="ai-writing-prompting.html">Writing &amp; Prompting</a>
+  </nav>
+</header>
+
+<!-- HERO -->
+<div class="hero">
+  <h1>AI Risks &amp; Ethics: Challenges &amp; Frameworks</h1>
+  <p class="subtitle">Looking beyond the hype — understanding what can go wrong and what guides responsible AI use</p>
+  <div class="badges">
+    <span class="badge">AI Literacy</span>
+    <span class="badge">Ethics</span>
+    <span class="badge">Critical Thinking</span>
+  </div>
+  <div class="credit">
+    Designed by <a href="https://www.linkedin.com/in/hagu1/" target="_blank">Hamid Guedra</a> &nbsp;·&nbsp;
+    <a href="https://lab.fi/en" target="_blank">LAB University of Applied Sciences</a> &nbsp;·&nbsp;
+    Generated with Claude 4.6
+  </div>
+</div>
+
+<!-- TAB BAR -->
+<nav class="tabs-bar">
+  <button class="tab-btn active" data-tab="overview">📖 Overview</button>
+  <button class="tab-btn" data-tab="risks">⚠️ Risks</button>
+  <button class="tab-btn" data-tab="frameworks">🛡️ Frameworks</button>
+  <button class="tab-btn" data-tab="quiz">📝 Quiz</button>
+  <button class="tab-btn" data-tab="sources">📚 Sources</button>
+</nav>
+
+
+<!-- ══════════ OVERVIEW ══════════ -->
+<div class="tab-panel active" id="tab-overview">
+<div class="container">
+  <p class="section-intro">This tool covers two connected areas: the <strong>immediate risks</strong> of AI systems (hallucinations, bias, environmental impact, copyright and privacy) and the <strong>ethical frameworks</strong> that guide responsible AI development and use (Asimov's Laws as a thought experiment, and UNESCO's human-rights-based approach as practical guidance).</p>
+
+  <p class="section-label">The big picture</p>
+
+  <!-- Balance diagram -->
+  <div class="balance-diagram">
+    <div class="balance-label">⚖️ &nbsp;Balancing Innovation &amp; Responsibility</div>
+    <div class="balance-cols">
+      <div class="balance-box risks">
+        <h4>⚠️ Immediate Risks</h4>
+        <p>Hallucinations, bias, environmental impact, copyright &amp; privacy</p>
+      </div>
+      <div class="balance-arrow">⟷</div>
+      <div class="balance-box ethics">
+        <h4>🛡️ Ethical Frameworks</h4>
+        <p>Asimov's Laws (theoretical), UNESCO Recommendation (practical)</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="callout info">
+    <span>ℹ️</span>
+    <span>AI tools are powerful, but they are not neutral. They reflect the data they were trained on, the choices their designers made, and the infrastructure that powers them. Using AI responsibly means understanding <strong>what can go wrong</strong> and <strong>what principles should guide use</strong>.</span>
+  </div>
+
+  <p class="section-label">Key terms</p>
+
+  <details class="accordion">
+    <summary>📘 Glossary</summary>
+    <div class="accordion-body">
+      <p><strong>Hallucination</strong> — When an AI generates false information presented with high confidence, as though it were fact. The model is not "lying" — it is producing statistically plausible text that happens to be wrong.</p>
+      <p><strong>Bias (in AI)</strong> — Systematic errors or discrimination in AI output caused by biased training data or design choices. Often described as "garbage in, garbage out."</p>
+      <p><strong>Digital pollution</strong> — The environmental cost of training and running AI systems: energy consumption, water use for cooling, and carbon emissions from data centres.</p>
+      <p><strong>Copyright (in AI context)</strong> — The legal and ethical issue of AI models trained on copyrighted works without the creators' permission.</p>
+      <p><strong>Asimov's Three Laws of Robotics</strong> — A set of fictional rules from Isaac Asimov's science fiction, often used as a thought experiment for AI ethics. They are not a practical framework.</p>
+      <p><strong>UNESCO Recommendation on the Ethics of AI</strong> — The first global standard on AI ethics, adopted by 193 member states in November 2021. It emphasises transparency, fairness, human oversight, and accountability.</p>
+      <p><strong>Human oversight</strong> — The principle that humans should remain in control of AI systems, especially in high-stakes decisions affecting people's rights and well-being.</p>
+    </div>
+  </details>
+
+  <p class="back-top" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑ Back to top</p>
+</div>
+</div>
+
+
+<!-- ══════════ RISKS ══════════ -->
+<div class="tab-panel" id="tab-risks">
+<div class="container">
+  <p class="section-intro">These are the immediate, well-documented risks of current AI systems. Understanding them is essential for anyone using AI in academic or professional work.</p>
+
+  <p class="section-label">Four immediate risks — click to flip</p>
+
+  <div class="flash-grid">
+
+    <div class="flash-wrapper">
+      <div class="flash-card" onclick="this.classList.toggle('flipped')">
+        <div class="flash-front hallucination">
+          <div class="flash-icon">🧠❓</div>
+          <h3>Hallucinations</h3>
+          <div class="flash-hint">Click to learn more</div>
+        </div>
+        <div class="flash-back hallucination">
+          <h4>🧠❓ Hallucinations</h4>
+          <p>AI generates <strong>false information with high confidence</strong>. Language models predict the most likely next word rather than verifying facts, so they can produce text that reads convincingly but is entirely fabricated — including fake citations, invented statistics, and non-existent sources.</p>
+          <div class="flash-example">Example: Ask an AI for academic references on a niche topic. It may return author names, journal titles, and DOIs that look real but do not exist.</div>
+          <div class="flash-tap">Click to flip back</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="flash-wrapper">
+      <div class="flash-card" onclick="this.classList.toggle('flipped')">
+        <div class="flash-front bias">
+          <div class="flash-icon">⚖️</div>
+          <h3>Bias</h3>
+          <div class="flash-hint">Click to learn more</div>
+        </div>
+        <div class="flash-back bias">
+          <h4>⚖️ Bias</h4>
+          <p>AI amplifies <strong>discrimination from biased data</strong>. If the training data reflects historical inequalities — gender, racial, cultural — the model will reproduce and sometimes intensify those patterns. This is often summarised as "garbage in, garbage out."</p>
+          <div class="flash-example">Example: A hiring AI trained on historical data may penalise CVs from women if past hiring patterns favoured men.</div>
+          <div class="flash-tap">Click to flip back</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="flash-wrapper">
+      <div class="flash-card" onclick="this.classList.toggle('flipped')">
+        <div class="flash-front environment">
+          <div class="flash-icon">🌍⚡</div>
+          <h3>Environmental Impact</h3>
+          <div class="flash-hint">Click to learn more</div>
+        </div>
+        <div class="flash-back environment">
+          <h4>🌍⚡ Environmental Impact</h4>
+          <p>Training large AI models is <strong>energy-intensive</strong> and contributes to "digital pollution." A single training run for a large language model can emit as much carbon as several transatlantic flights. Data centres also consume significant water for cooling.</p>
+          <div class="flash-example">Perspective: Training GPT-3 reportedly consumed approximately 1,287 MWh of energy and emitted around 552 tonnes of CO₂.</div>
+          <div class="flash-tap">Click to flip back</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="flash-wrapper">
+      <div class="flash-card" onclick="this.classList.toggle('flipped')">
+        <div class="flash-front copyright">
+          <div class="flash-icon">©️🔒</div>
+          <h3>Copyright &amp; Privacy</h3>
+          <div class="flash-hint">Click to learn more</div>
+        </div>
+        <div class="flash-back copyright">
+          <h4>©️🔒 Copyright &amp; Privacy</h4>
+          <p>AI models are trained on <strong>works used without permission</strong> and may process <strong>insecure user data</strong>. Writers, artists, and programmers have found their work reproduced without consent or compensation. User inputs may also be stored and used for further training.</p>
+          <div class="flash-example">Example: Multiple lawsuits (e.g., The New York Times v. OpenAI, 2023) allege that AI training data included copyrighted material without licence.</div>
+          <div class="flash-tap">Click to flip back</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <p class="section-label">Why these risks matter for academic work</p>
+
+  <details class="accordion">
+    <summary>🎓 Implications for students and researchers</summary>
+    <div class="accordion-body">
+      <p><strong>Hallucinations</strong> mean you cannot trust AI-generated references or facts without independent verification. Always check sources.</p>
+      <p><strong>Bias</strong> means AI output may reflect dominant perspectives and marginalise minority viewpoints. Be especially cautious with AI-generated content on topics involving culture, gender, race, or social issues.</p>
+      <p><strong>Environmental impact</strong> raises questions about the proportionality of AI use — is using a massive model justified for a simple task?</p>
+      <p><strong>Copyright and privacy</strong> mean you should never input confidential data (personal information, unpublished research, proprietary business data) into public AI tools without understanding the platform's data policy.</p>
+    </div>
+  </details>
+
+  <div class="callout warn">
+    <span>⚠️</span>
+    <span><strong>Rule of thumb:</strong> Treat AI output like advice from a confident but unreliable colleague. It may be useful, but it always needs to be checked.</span>
+  </div>
+
+  <p class="back-top" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑ Back to top</p>
+</div>
+</div>
+
+
+<!-- ══════════ FRAMEWORKS ══════════ -->
+<div class="tab-panel" id="tab-frameworks">
+<div class="container">
+  <p class="section-intro">Ethical frameworks help us move from identifying risks to taking principled action. Here we examine two contrasting approaches: a famous <strong>thought experiment</strong> from fiction and a <strong>practical international standard</strong> adopted by 193 countries.</p>
+
+  <p class="section-label">Ethical approaches</p>
+
+  <details class="accordion">
+    <summary>🤖 Thought Experiment — Asimov's Three Laws of Robotics</summary>
+    <div class="accordion-body">
+      <p style="margin-top:10px;font-size:12px;color:var(--gray-400);font-weight:600;text-transform:uppercase;letter-spacing:.05em;">Theoretical — not practical</p>
+      <p>Isaac Asimov introduced these rules in his 1942 short story "Runaround" as a fictional framework for governing robot behaviour. They are often referenced in AI ethics discussions, but they were designed as a <strong>narrative device</strong>, not a real-world policy tool.</p>
+      <ol class="laws-list">
+        <li>A robot may not injure a human being or, through inaction, allow a human being to come to harm.</li>
+        <li>A robot must obey the orders given it by human beings, except where such orders would conflict with the First Law.</li>
+        <li>A robot must protect its own existence, as long as such protection does not conflict with the First or Second Law.</li>
+      </ol>
+      <div class="callout tip" style="margin-top:12px;">
+        <span>💡</span>
+        <span><strong>Why they fail in practice:</strong> Asimov's own stories repeatedly show these laws producing contradictions and unintended consequences. Real AI systems lack the contextual understanding needed to interpret abstract principles like "harm." The Laws are valuable as a thinking exercise, not as a governance model.</span>
+      </div>
+    </div>
+  </details>
+
+  <details class="accordion">
+    <summary>🌐 Practical Guidance — UNESCO Recommendation on the Ethics of AI (2021)</summary>
+    <div class="accordion-body">
+      <p style="margin-top:10px;font-size:12px;color:var(--gray-400);font-weight:600;text-transform:uppercase;letter-spacing:.05em;">Human-rights approach</p>
+      <p>Adopted in November 2021 by all 193 UNESCO member states, this is the <strong>first global standard</strong> on AI ethics. Unlike Asimov's fictional rules, it provides concrete policy actions and implementation tools for governments, organisations, and educators.</p>
+      <p>The Recommendation is built on four core values:</p>
+      <div class="principle-chips">
+        <span class="principle-chip">Human Rights &amp; Dignity</span>
+        <span class="principle-chip">Peaceful &amp; Just Societies</span>
+        <span class="principle-chip">Diversity &amp; Inclusiveness</span>
+        <span class="principle-chip">Environment &amp; Ecosystems</span>
+      </div>
+      <p>These values translate into key operational principles:</p>
+      <div class="principle-chips">
+        <span class="principle-chip">Transparency</span>
+        <span class="principle-chip">Fairness</span>
+        <span class="principle-chip">Human Oversight</span>
+        <span class="principle-chip">Accountability</span>
+        <span class="principle-chip">Do No Harm</span>
+      </div>
+    </div>
+  </details>
+
+  <details class="accordion">
+    <summary>⚖️ Comparing the Two</summary>
+    <div class="accordion-body">
+      <table style="width:100%;border-collapse:collapse;font-size:13px;margin:10px 0;">
+        <thead>
+          <tr style="background:var(--gray-100);">
+            <th style="padding:8px 12px;text-align:left;font-weight:600;color:var(--gray-700);border-bottom:2px solid var(--gray-200);"></th>
+            <th style="padding:8px 12px;text-align:left;font-weight:600;color:var(--gray-700);border-bottom:2px solid var(--gray-200);">Asimov's Laws</th>
+            <th style="padding:8px 12px;text-align:left;font-weight:600;color:var(--gray-700);border-bottom:2px solid var(--gray-200);">UNESCO Recommendation</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td style="padding:8px 12px;border-bottom:1px solid var(--gray-100);font-weight:600;">Origin</td><td style="padding:8px 12px;border-bottom:1px solid var(--gray-100);">Science fiction (1942)</td><td style="padding:8px 12px;border-bottom:1px solid var(--gray-100);">International policy (2021)</td></tr>
+          <tr><td style="padding:8px 12px;border-bottom:1px solid var(--gray-100);font-weight:600;">Type</td><td style="padding:8px 12px;border-bottom:1px solid var(--gray-100);">Thought experiment</td><td style="padding:8px 12px;border-bottom:1px solid var(--gray-100);">Practical framework with policy actions</td></tr>
+          <tr><td style="padding:8px 12px;border-bottom:1px solid var(--gray-100);font-weight:600;">Scope</td><td style="padding:8px 12px;border-bottom:1px solid var(--gray-100);">3 abstract rules for robots</td><td style="padding:8px 12px;border-bottom:1px solid var(--gray-100);">4 values, 10 principles, 11 policy areas</td></tr>
+          <tr><td style="padding:8px 12px;border-bottom:1px solid var(--gray-100);font-weight:600;">Enforceability</td><td style="padding:8px 12px;border-bottom:1px solid var(--gray-100);">None — fictional</td><td style="padding:8px 12px;border-bottom:1px solid var(--gray-100);">Non-binding but adopted by 193 states</td></tr>
+          <tr><td style="padding:8px 12px;font-weight:600;">Value</td><td style="padding:8px 12px;">Useful for discussion and critical thinking</td><td style="padding:8px 12px;">Actionable guidance for policy and practice</td></tr>
+        </tbody>
+      </table>
+      <div class="callout info" style="margin-top:10px;">
+        <span>ℹ️</span>
+        <span><strong>Key takeaway:</strong> Asimov's Laws are a good starting point for <em>discussing</em> AI ethics. UNESCO's Recommendation is the starting point for <em>implementing</em> AI ethics.</span>
+      </div>
+    </div>
+  </details>
+
+  <p class="back-top" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑ Back to top</p>
+</div>
+</div>
+
+
+<!-- ══════════ QUIZ ══════════ -->
+<div class="tab-panel" id="tab-quiz">
+<div class="container">
+  <p class="section-intro">Test your understanding of AI risks and ethical frameworks. Select the best answer for each question.</p>
+
+  <p class="section-label">Quiz</p>
+
+  <div id="quiz-container">
+
+    <div class="quiz-question" data-correct="2">
+      <h3>1. What is an AI "hallucination"?</h3>
+      <div class="quiz-options">
+        <button class="quiz-option" data-index="0">When an AI has a technical malfunction</button>
+        <button class="quiz-option" data-index="1">When an AI refuses to answer a question</button>
+        <button class="quiz-option" data-index="2">When an AI generates false information presented as fact</button>
+        <button class="quiz-option" data-index="3">When an AI produces images instead of text</button>
+      </div>
+      <div class="quiz-feedback"></div>
+    </div>
+
+    <div class="quiz-question" data-correct="1">
+      <h3>2. "Garbage in, garbage out" best describes which AI risk?</h3>
+      <div class="quiz-options">
+        <button class="quiz-option" data-index="0">Hallucinations</button>
+        <button class="quiz-option" data-index="1">Bias</button>
+        <button class="quiz-option" data-index="2">Environmental impact</button>
+        <button class="quiz-option" data-index="3">Copyright violation</button>
+      </div>
+      <div class="quiz-feedback"></div>
+    </div>
+
+    <div class="quiz-question" data-correct="0">
+      <h3>3. Why is AI training considered a contributor to "digital pollution"?</h3>
+      <div class="quiz-options">
+        <button class="quiz-option" data-index="0">It requires massive energy consumption and produces carbon emissions</button>
+        <button class="quiz-option" data-index="1">It generates too many spam emails</button>
+        <button class="quiz-option" data-index="2">It creates electronic waste from old computers</button>
+        <button class="quiz-option" data-index="3">It pollutes search engine results</button>
+      </div>
+      <div class="quiz-feedback"></div>
+    </div>
+
+    <div class="quiz-question" data-correct="3">
+      <h3>4. What is the main copyright concern with AI training data?</h3>
+      <div class="quiz-options">
+        <button class="quiz-option" data-index="0">AI companies do not pay for electricity</button>
+        <button class="quiz-option" data-index="1">AI models cannot generate original content</button>
+        <button class="quiz-option" data-index="2">Users must pay to use AI-generated text</button>
+        <button class="quiz-option" data-index="3">Models are trained on works used without the creators' permission</button>
+      </div>
+      <div class="quiz-feedback"></div>
+    </div>
+
+    <div class="quiz-question" data-correct="1">
+      <h3>5. Asimov's Three Laws of Robotics are best described as:</h3>
+      <div class="quiz-options">
+        <button class="quiz-option" data-index="0">International law enforced by the United Nations</button>
+        <button class="quiz-option" data-index="1">A fictional thought experiment, not a practical framework</button>
+        <button class="quiz-option" data-index="2">The basis of all modern AI regulation</button>
+        <button class="quiz-option" data-index="3">A set of programming instructions built into every AI</button>
+      </div>
+      <div class="quiz-feedback"></div>
+    </div>
+
+    <div class="quiz-question" data-correct="0">
+      <h3>6. The UNESCO Recommendation on the Ethics of AI (2021) emphasises which of the following?</h3>
+      <div class="quiz-options">
+        <button class="quiz-option" data-index="0">Transparency, fairness, human oversight, and accountability</button>
+        <button class="quiz-option" data-index="1">Speed, efficiency, automation, and profit</button>
+        <button class="quiz-option" data-index="2">That AI should replace all human decision-making</button>
+        <button class="quiz-option" data-index="3">That only wealthy countries should develop AI</button>
+      </div>
+      <div class="quiz-feedback"></div>
+    </div>
+
+    <div class="quiz-question" data-correct="2">
+      <h3>7. Why should you never input confidential data into a public AI tool?</h3>
+      <div class="quiz-options">
+        <button class="quiz-option" data-index="0">The AI will immediately publish it online</button>
+        <button class="quiz-option" data-index="1">It will make the AI crash</button>
+        <button class="quiz-option" data-index="2">User inputs may be stored and used for further training</button>
+        <button class="quiz-option" data-index="3">Confidential data makes the AI produce worse results</button>
+      </div>
+      <div class="quiz-feedback"></div>
+    </div>
+
+    <div class="quiz-question" data-correct="3">
+      <h3>8. How many UNESCO member states adopted the Recommendation on the Ethics of AI?</h3>
+      <div class="quiz-options">
+        <button class="quiz-option" data-index="0">27 (EU member states only)</button>
+        <button class="quiz-option" data-index="1">50</button>
+        <button class="quiz-option" data-index="2">100</button>
+        <button class="quiz-option" data-index="3">193</button>
+      </div>
+      <div class="quiz-feedback"></div>
+    </div>
+
+  </div>
+
+  <div class="quiz-score" id="quiz-score" style="display:none;">
+    <div class="score-number" id="score-display">0 / 8</div>
+    <div class="score-label">Questions answered correctly</div>
+    <button class="reset-btn" onclick="resetQuiz()">Try Again</button>
+  </div>
+
+  <p class="back-top" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑ Back to top</p>
+</div>
+</div>
+
+
+<!-- ══════════ SOURCES ══════════ -->
+<div class="tab-panel" id="tab-sources">
+<div class="container">
+  <p class="section-intro">Sources and further reading on AI risks and ethical frameworks.</p>
+
+  <details class="accordion">
+    <summary>📚 UNESCO — Recommendation on the Ethics of Artificial Intelligence (2021)</summary>
+    <div class="accordion-body">
+      <a class="source-link" href="https://www.unesco.org/en/artificial-intelligence/recommendation-ethics" target="_blank">unesco.org — Ethics of Artificial Intelligence</a>
+      <p>The first global standard on AI ethics, adopted by 193 member states in November 2021. Covers core values (human rights, fairness, inclusiveness, environment), operational principles (transparency, accountability, human oversight), and 11 policy action areas.</p>
+    </div>
+  </details>
+
+  <details class="accordion">
+    <summary>📚 UNESCO — Full text of the Recommendation</summary>
+    <div class="accordion-body">
+      <a class="source-link" href="https://unesdoc.unesco.org/ark:/48223/pf0000380455" target="_blank">unesdoc.unesco.org — Recommendation on the Ethics of AI (PDF)</a>
+      <p>The complete official text of the Recommendation, adopted at the 41st session of the General Conference of UNESCO, 23 November 2021.</p>
+    </div>
+  </details>
+
+  <details class="accordion">
+    <summary>📚 Asimov, I. (1942) — "Runaround"</summary>
+    <div class="accordion-body">
+      <a class="source-link" href="https://archive.org/details/i-robot-isaac-asimov" target="_blank">Internet Archive — I, Robot (borrowable)</a>
+      <p>The short story in which Asimov first explicitly stated the Three Laws of Robotics. Originally published in <em>Astounding Science Fiction</em>, March 1942. Collected in <em>I, Robot</em> (1950), available for controlled digital lending via the Internet Archive.</p>
+    </div>
+  </details>
+
+  <details class="accordion">
+    <summary>📚 Britannica — Artificial Intelligence (AI)</summary>
+    <div class="accordion-body">
+      <a class="source-link" href="https://www.britannica.com/technology/artificial-intelligence" target="_blank">britannica.com — Artificial Intelligence</a>
+      <p>Comprehensive encyclopaedia entry covering AI definitions, categories, risks, and ethical considerations. Written and reviewed by B.J. Copeland.</p>
+    </div>
+  </details>
+
+  <p class="back-top" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑ Back to top</p>
+</div>
+</div>
+
+
+<!-- FOOTER -->
+<footer class="page-footer">
+  AI Risks &amp; Ethics: Challenges &amp; Frameworks &nbsp;·&nbsp;
+  <a href="https://www.linkedin.com/in/hagu1/" target="_blank">Hamid Guedra</a> &nbsp;·&nbsp;
+  <a href="https://lab.fi/en" target="_blank">LAB University of Applied Sciences</a>
+</footer>
+
+<script>
+// Tab switching
+document.querySelectorAll('.tab-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('tab-' + btn.dataset.tab).classList.add('active');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+});
+
+// Quiz logic
+const feedbackMap = {
+  0: { correct: "Correct! A hallucination is when AI generates false information presented with high confidence, as though it were fact.", incorrect: "Not quite. A hallucination is when AI produces false information that reads convincingly — it's not a malfunction, it's a feature of how language models work." },
+  1: { correct: "Correct! 'Garbage in, garbage out' describes how biased training data leads to biased AI output.", incorrect: "Not quite. 'Garbage in, garbage out' refers to bias — if training data contains discrimination, the model will reproduce it." },
+  2: { correct: "Correct! Training large AI models requires massive amounts of energy and produces significant carbon emissions.", incorrect: "Not quite. The environmental concern is about the energy consumption and carbon emissions from training and running large AI models." },
+  3: { correct: "Correct! A key copyright concern is that AI models are trained on works used without the original creators' permission.", incorrect: "Not quite. The main copyright issue is that training data often includes works used without permission from their creators." },
+  4: { correct: "Correct! Asimov's Laws are a fictional thought experiment from science fiction, not a practical governance framework.", incorrect: "Not quite. Asimov's Laws come from his 1942 science fiction and were designed as a narrative device, not real-world policy." },
+  5: { correct: "Correct! The UNESCO Recommendation emphasises transparency, fairness, human oversight, and accountability.", incorrect: "Not quite. UNESCO's framework centres on transparency, fairness, human oversight, and accountability — not on speed or profit." },
+  6: { correct: "Correct! User inputs to public AI tools may be stored and used for further model training, risking privacy.", incorrect: "Not quite. The privacy risk is that user inputs may be stored and used for further training — your confidential data could end up in the model." },
+  7: { correct: "Correct! All 193 UNESCO member states adopted the Recommendation in November 2021.", incorrect: "Not quite. The Recommendation was adopted by all 193 UNESCO member states, making it the most inclusive global AI ethics standard." }
+};
+
+let answered = 0;
+let score = 0;
+const totalQuestions = document.querySelectorAll('.quiz-question').length;
+
+document.querySelectorAll('.quiz-question').forEach((q, qIndex) => {
+  const correctIndex = parseInt(q.dataset.correct);
+  const options = q.querySelectorAll('.quiz-option');
+  const feedback = q.querySelector('.quiz-feedback');
+
+  options.forEach(opt => {
+    opt.addEventListener('click', () => {
+      if (q.dataset.answered) return;
+      q.dataset.answered = 'true';
+      answered++;
+
+      const selected = parseInt(opt.dataset.index);
+      const isCorrect = selected === correctIndex;
+
+      if (isCorrect) {
+        score++;
+        opt.classList.add('correct');
+        feedback.className = 'quiz-feedback show correct-fb';
+        feedback.textContent = feedbackMap[qIndex].correct;
+      } else {
+        opt.classList.add('incorrect');
+        opt.classList.add('shake');
+        setTimeout(() => opt.classList.remove('shake'), 400);
+        options[correctIndex].classList.add('correct');
+        feedback.className = 'quiz-feedback show incorrect-fb';
+        feedback.textContent = feedbackMap[qIndex].incorrect;
+      }
+
+      options.forEach(o => o.classList.add('disabled'));
+
+      if (answered === totalQuestions) {
+        const scoreEl = document.getElementById('quiz-score');
+        scoreEl.style.display = 'block';
+        document.getElementById('score-display').textContent = score + ' / ' + totalQuestions;
+      }
+    });
+  });
+});
+
+function resetQuiz() {
+  answered = 0;
+  score = 0;
+  document.querySelectorAll('.quiz-question').forEach(q => {
+    delete q.dataset.answered;
+    q.querySelectorAll('.quiz-option').forEach(o => {
+      o.classList.remove('correct', 'incorrect', 'disabled', 'shake');
+    });
+    const fb = q.querySelector('.quiz-feedback');
+    fb.className = 'quiz-feedback';
+    fb.textContent = '';
+  });
+  document.getElementById('quiz-score').style.display = 'none';
+}
+</script>
+</body>
+</html>

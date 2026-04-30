@@ -1,0 +1,909 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>GenAI in Writing & Prompting Techniques — A Practical Guide</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet"/>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --blue:        #1a56db;
+  --blue-light:  #e8f0fe;
+  --blue-dark:   #1e3a8a;
+  --green:       #057a55;
+  --green-light: #def7ec;
+  --yellow:      #c27803;
+  --yellow-light:#fdf6b2;
+  --orange:      #c2500a;
+  --purple:      #7c3aed;
+  --purple-light:#ede9fe;
+  --red:         #dc2626;
+  --red-light:   #fee2e2;
+  --gray-50:     #f9fafb;
+  --gray-100:    #f3f4f6;
+  --gray-200:    #e5e7eb;
+  --gray-400:    #9ca3af;
+  --gray-600:    #4b5563;
+  --gray-700:    #374151;
+  --gray-800:    #1f2937;
+  --gray-900:    #111827;
+  --radius:      8px;
+}
+
+body {
+  font-family: 'Inter', sans-serif;
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--gray-800);
+  background: var(--gray-50);
+}
+
+/* ── SITE HEADER ── */
+.site-header {
+  background: white;
+  border-bottom: 1px solid var(--gray-200);
+  padding: 12px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 1px 3px rgba(0,0,0,.06);
+}
+.site-header .course-name { font-size: 13px; font-weight: 600; color: var(--gray-600); }
+.site-header .course-name a { color: var(--blue); text-decoration: none; }
+.site-header .course-name a:hover { text-decoration: underline; }
+.site-header .inst { font-size: 12px; color: var(--gray-400); }
+.site-header .inst a { color: var(--gray-400); text-decoration: none; }
+.site-header .inst a:hover { text-decoration: underline; color: var(--gray-600); }
+
+/* ── HERO ── */
+.hero {
+  background: linear-gradient(135deg, #1e3a8a 0%, #1a56db 60%, #2563eb 100%);
+  color: white;
+  padding: 48px 24px 40px;
+  text-align: center;
+}
+.hero h1 { font-size: clamp(22px, 4vw, 30px); font-weight: 700; margin-bottom: 8px; }
+.hero .subtitle { font-size: 15px; opacity: .75; margin-bottom: 24px; }
+.badges { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-bottom: 20px; }
+.badge { background: rgba(255,255,255,.18); border: 1px solid rgba(255,255,255,.3); border-radius: 999px; padding: 4px 14px; font-size: 13px; font-weight: 500; }
+.credit { font-size: 12px; opacity: .55; }
+.credit a { color: white; }
+
+/* ── STICKY TAB BAR ── */
+.tabs-bar {
+  background: white;
+  border-bottom: 2px solid var(--gray-200);
+  display: flex;
+  overflow-x: auto;
+  scrollbar-width: none;
+  position: sticky;
+  top: 45px;
+  z-index: 99;
+  justify-content: center;
+}
+.tabs-bar::-webkit-scrollbar { display: none; }
+.tab-btn {
+  padding: 14px 18px; font-size: 13px; font-weight: 600; color: var(--gray-600);
+  border: none; background: none; cursor: pointer; white-space: nowrap;
+  border-bottom: 2px solid transparent; margin-bottom: -2px;
+  transition: color .15s, border-color .15s; font-family: 'Inter', sans-serif;
+}
+.tab-btn:hover { color: var(--blue); }
+.tab-btn.active { color: var(--blue); border-bottom-color: var(--blue); }
+
+/* ── PANELS ── */
+.tab-panel { display: none; }
+.tab-panel.active { display: block; }
+.container { max-width: 900px; margin: 0 auto; padding: 32px 20px 80px; }
+
+/* ── SECTION HEADINGS ── */
+.section-label {
+  font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase;
+  color: var(--gray-600); margin: 28px 0 10px; padding-bottom: 8px;
+  border-bottom: 1px solid var(--gray-200);
+}
+.section-intro { font-size: 14px; color: var(--gray-600); margin-bottom: 20px; line-height: 1.7; }
+
+/* ── ACCORDION ── */
+.accordion { border: 1px solid #b2dce8; border-radius: var(--radius); margin-bottom: 10px; background: white; overflow: hidden; }
+.accordion summary {
+  padding: 14px 18px; font-weight: 600; font-size: 14px; cursor: pointer;
+  display: flex; align-items: center; gap: 8px; list-style: none;
+  user-select: none; background: #e8f6f9; color: #1a4a56;
+}
+.accordion summary::-webkit-details-marker { display: none; }
+.accordion summary::after { content: '▾'; margin-left: auto; font-size: 12px; color: #4a8fa0; transition: transform .2s; }
+.accordion[open] summary::after { transform: rotate(180deg); }
+.accordion summary:hover { background: #d4eef4; }
+.accordion-body { padding: 0 18px 18px; border-top: 1px solid #b2dce8; font-size: 14px; color: var(--gray-700); }
+.accordion-body p { margin-top: 10px; }
+
+/* ── CALLOUTS ── */
+.callout { border-radius: var(--radius); padding: 12px 16px; margin: 14px 0; font-size: 13.5px; display: flex; gap: 10px; }
+.callout.info    { background: var(--blue-light);    border-left: 3px solid var(--blue);   color: #1e3a8a; }
+.callout.warn    { background: var(--yellow-light);  border-left: 3px solid var(--yellow); color: #78350f; }
+.callout.success { background: var(--green-light);   border-left: 3px solid var(--green);  color: #064e3b; }
+.callout.tip     { background: #e8f6f9; border-left: 3px solid #4a8fa0; color: #1a4a56; }
+.callout.error   { background: var(--red-light);     border-left: 3px solid var(--red);    color: #7f1d1d; }
+
+/* ── ROLE CHIPS ── */
+.role-chip { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .07em; border-radius: 999px; padding: 2px 9px; color: white; display: inline-block; }
+
+/* ── EXAMPLE ITEMS ── */
+.example-item {
+  background: var(--gray-100); color: var(--gray-900); border-radius: 6px;
+  padding: 8px 14px; font-family: 'JetBrains Mono', monospace; font-size: 13px;
+  line-height: 1.65; margin-bottom: 6px; border: 1px solid var(--gray-200);
+}
+.example-item .verb { color: var(--blue); font-weight: 700; }
+.examples-label { font-size: 11px; font-weight: 700; letter-spacing: .07em; text-transform: uppercase; color: var(--gray-600); margin: 12px 0 6px; }
+
+/* ── BACK TO TOP ── */
+.back-top { display: inline-block; margin-top: 24px; font-size: 13px; color: var(--blue); cursor: pointer; }
+a { color: var(--blue); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+/* ── PROCESS FLOW CARDS ── */
+.flow-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin: 16px 0;
+}
+@media (max-width: 600px) {
+  .flow-grid { grid-template-columns: 1fr; }
+}
+
+.flow-card {
+  background: white;
+  border: 1px solid var(--gray-200);
+  border-radius: var(--radius);
+  padding: 20px;
+  position: relative;
+  transition: box-shadow .2s, transform .2s;
+}
+.flow-card:hover {
+  box-shadow: 0 4px 12px rgba(0,0,0,.08);
+  transform: translateY(-2px);
+}
+.flow-card-number {
+  position: absolute;
+  top: -10px;
+  left: 16px;
+  background: var(--blue);
+  color: white;
+  font-size: 11px;
+  font-weight: 700;
+  width: 24px;
+  height: 24px;
+  border-radius: 999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.flow-card h3 {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--gray-800);
+  margin-bottom: 6px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.flow-card p {
+  font-size: 13px;
+  color: var(--gray-600);
+  line-height: 1.6;
+}
+.flow-card .card-icon {
+  font-size: 20px;
+  margin-bottom: 8px;
+}
+
+/* ── CONNECTOR ARROW ── */
+.flow-connector {
+  text-align: center;
+  padding: 8px 0;
+  color: var(--gray-400);
+  font-size: 20px;
+}
+.flow-connector-horizontal {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 16px 0;
+  color: var(--blue);
+  font-size: 13px;
+  font-weight: 600;
+}
+.flow-connector-horizontal .arrow-line {
+  width: 40px;
+  height: 2px;
+  background: var(--blue);
+  position: relative;
+}
+.flow-connector-horizontal .arrow-line::after {
+  content: '▶';
+  position: absolute;
+  right: -12px;
+  top: -8px;
+  font-size: 12px;
+}
+
+/* ── TECHNIQUE CARDS ── */
+.tech-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 12px;
+  margin: 16px 0;
+}
+@media (max-width: 500px) {
+  .tech-grid { grid-template-columns: 1fr; }
+}
+
+.tech-card {
+  background: white;
+  border: 1px solid var(--gray-200);
+  border-radius: var(--radius);
+  padding: 16px;
+  border-top: 3px solid var(--blue);
+  transition: box-shadow .2s, transform .2s;
+}
+.tech-card:hover {
+  box-shadow: 0 4px 12px rgba(0,0,0,.08);
+  transform: translateY(-2px);
+}
+.tech-card.highlight { border-top-color: var(--green); }
+.tech-card.caution   { border-top-color: var(--yellow); }
+.tech-card.advanced  { border-top-color: var(--purple); }
+
+.tech-card h3 {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--gray-800);
+  margin-bottom: 4px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.tech-card p {
+  font-size: 13px;
+  color: var(--gray-600);
+  line-height: 1.6;
+}
+.tech-card .tech-example {
+  margin-top: 8px;
+  background: var(--gray-100);
+  border: 1px solid var(--gray-200);
+  border-radius: 6px;
+  padding: 6px 10px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  color: var(--gray-700);
+  line-height: 1.5;
+}
+
+/* ── QUIZ ── */
+.quiz-question {
+  background: white;
+  border: 1px solid var(--gray-200);
+  border-radius: var(--radius);
+  padding: 20px;
+  margin-bottom: 16px;
+}
+.quiz-question h3 {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--gray-800);
+  margin-bottom: 12px;
+}
+.quiz-options {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+@media (max-width: 500px) {
+  .quiz-options { grid-template-columns: 1fr; }
+}
+.quiz-option {
+  padding: 10px 14px;
+  border: 2px solid var(--gray-200);
+  border-radius: var(--radius);
+  background: white;
+  cursor: pointer;
+  font-size: 13px;
+  font-family: 'Inter', sans-serif;
+  color: var(--gray-700);
+  transition: border-color .15s, background .15s;
+  text-align: left;
+}
+.quiz-option:hover { border-color: var(--blue); background: var(--blue-light); }
+.quiz-option.correct { border-color: var(--green); background: var(--green-light); color: #064e3b; }
+.quiz-option.incorrect { border-color: var(--red); background: var(--red-light); color: #7f1d1d; }
+.quiz-option.disabled { pointer-events: none; opacity: 0.7; }
+.quiz-feedback {
+  margin-top: 10px;
+  font-size: 13px;
+  padding: 8px 12px;
+  border-radius: 6px;
+  display: none;
+}
+.quiz-feedback.show { display: block; }
+.quiz-feedback.correct-fb { background: var(--green-light); color: #064e3b; border-left: 3px solid var(--green); }
+.quiz-feedback.incorrect-fb { background: var(--red-light); color: #7f1d1d; border-left: 3px solid var(--red); }
+
+.quiz-score {
+  background: white;
+  border: 1px solid var(--gray-200);
+  border-radius: var(--radius);
+  padding: 20px;
+  text-align: center;
+  margin-top: 20px;
+}
+.quiz-score .score-number { font-size: 28px; font-weight: 700; color: var(--blue); }
+.quiz-score .score-label { font-size: 13px; color: var(--gray-600); }
+
+.reset-btn {
+  display: inline-block;
+  margin-top: 12px;
+  padding: 8px 20px;
+  background: var(--blue);
+  color: white;
+  border: none;
+  border-radius: var(--radius);
+  font-size: 13px;
+  font-weight: 600;
+  font-family: 'Inter', sans-serif;
+  cursor: pointer;
+  transition: background .15s;
+}
+.reset-btn:hover { background: var(--blue-dark); }
+
+/* ── HUMAN AGENCY BANNER ── */
+.agency-banner {
+  background: var(--yellow-light);
+  border: 1px solid #f6d860;
+  border-radius: var(--radius);
+  padding: 16px 20px;
+  margin: 20px 0;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+.agency-banner .icon { font-size: 24px; flex-shrink: 0; }
+.agency-banner h3 { font-size: 14px; font-weight: 700; color: #78350f; margin-bottom: 4px; }
+.agency-banner p { font-size: 13px; color: #78350f; line-height: 1.6; }
+
+/* ── SHAKE ── */
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25%      { transform: translateX(-6px); }
+  75%      { transform: translateX(6px); }
+}
+.shake { animation: shake .35s ease both; }
+
+/* ── SOURCE LINK ── */
+.source-link {
+  display: inline-block;
+  margin-top: 8px;
+  font-size: 13px;
+  color: var(--blue);
+}
+
+/* ── FOOTER ── */
+.page-footer { text-align: center; padding: 24px; font-size: 12px; color: var(--gray-400); border-top: 1px solid var(--gray-200); margin-top: 40px; }
+.page-footer a { color: var(--gray-600); text-decoration: none; }
+.page-footer a:hover { text-decoration: underline; }
+/* ── NAV BAR ── */
+.site-header { flex-wrap: wrap; gap: 8px; }
+.site-nav { display: flex; gap: 4px; align-items: center; }
+.site-nav a {
+  font-size: 12px; font-weight: 500; color: var(--gray-600);
+  padding: 4px 10px; border-radius: 999px; text-decoration: none;
+  transition: background .15s, color .15s; white-space: nowrap;
+}
+.site-nav a:hover { background: var(--blue-light); color: var(--blue); text-decoration: none; }
+.site-nav a.current { background: var(--blue); color: white; pointer-events: none; }
+.nav-sep { color: var(--gray-200); font-size: 14px; user-select: none; }
+</style>
+</head>
+<body>
+
+<!-- SITE HEADER -->
+<header class="site-header">
+  <div>
+    <div class="course-name">Academic English Writing &nbsp;·&nbsp; <a href="https://www.linkedin.com/in/hagu1/" target="_blank">Hamid Guedra</a></div>
+    <div class="inst"><a href="https://lab.fi/en" target="_blank">LAB University of Applied Sciences</a></div>
+  </div>
+</header>
+
+<!-- HERO -->
+<div class="hero">
+  <h1>GenAI in Writing &amp; Prompting Techniques</h1>
+  <p class="subtitle">A practical guide to using AI as your writing buddy — with human oversight</p>
+  <div class="badges">
+    <span class="badge">AI Literacy</span>
+    <span class="badge">AI Prompting</span>
+    <span class="badge">AI-Assisted Writing</span>
+  </div>
+  <div class="credit">
+    Designed by <a href="https://www.linkedin.com/in/hagu1/" target="_blank">Hamid Guedra</a> &nbsp;·&nbsp;
+    <a href="https://lab.fi/en" target="_blank">LAB University of Applied Sciences</a> &nbsp;·&nbsp;
+    Generated with Claude 4.6
+  </div>
+</div>
+
+<!-- TAB BAR -->
+<nav class="tabs-bar">
+  <button class="tab-btn active" data-tab="guide">📖 Study Guide</button>
+  <button class="tab-btn" data-tab="writing">✍️ Writing Process</button>
+  <button class="tab-btn" data-tab="prompting">🎯 Prompting Techniques</button>
+  <button class="tab-btn" data-tab="quiz">📝 Challenge Quiz</button>
+  <button class="tab-btn" data-tab="sources">📚 Sources</button>
+</nav>
+
+
+<!-- ══════════ STUDY GUIDE ══════════ -->
+<div class="tab-panel active" id="tab-guide">
+<div class="container">
+  <p class="section-intro">This tool covers two connected skills: using GenAI responsibly in your writing process, and writing effective prompts to get better results. The left side is about <strong>what AI can help with</strong>; the right side is about <strong>how to talk to AI</strong>.</p>
+
+  <p class="section-label">The big picture</p>
+
+  <div class="callout info">
+    <span>ℹ️</span>
+    <span>GenAI is a <strong>buddy</strong>, not a replacement. You stay in charge of the thinking, the argument, and the final text. AI helps you get unstuck, explore ideas, and polish your work — but <em>you</em> own the output.</span>
+  </div>
+
+  <details class="accordion">
+    <summary>🧠 GenAI in the writing process</summary>
+    <div class="accordion-body">
+      <p>AI can assist at every stage of academic writing — prewriting, drafting, revising, and editing. The key is <strong>human agency</strong>: you direct the process, evaluate the output, and make the final decisions.</p>
+      <p>At each stage, AI plays a different support role. In prewriting, it helps brainstorm. In drafting, it suggests vocabulary and transitions. In revising, it checks logical flow. In editing, it catches grammar errors. But the critical thinking stays with you.</p>
+    </div>
+  </details>
+
+  <details class="accordion">
+    <summary>🎯 Prompting techniques</summary>
+    <div class="accordion-body">
+      <p>A prompt is the instruction you give AI. Better prompts produce better results — this is like giving clear directions to someone. There are five key techniques: zero-shot, few-shot, chain-of-thought, role prompting, and iterative prompting.</p>
+      <p>Mastering these techniques lets you <strong>optimize results through skillful interaction</strong> rather than accepting whatever the AI first produces.</p>
+    </div>
+  </details>
+
+  <div class="agency-banner">
+    <div class="icon">⚠️</div>
+    <div>
+      <h3>Human Agency Is Non-Negotiable</h3>
+      <p>AI can accelerate your writing, but it cannot think for you. Always evaluate AI output critically. Don't offload thinking during prewriting. Ask AI to <em>explain</em> errors rather than just fixing them. Your name goes on the work — make sure it reflects <em>your</em> understanding.</p>
+    </div>
+  </div>
+
+  <p class="section-label">Key terms</p>
+
+  <details class="accordion">
+    <summary>📘 Glossary</summary>
+    <div class="accordion-body">
+      <p><strong>GenAI (Generative AI)</strong> — AI systems that produce text, images, or other content based on patterns learned from data.</p>
+      <p><strong>Prompt</strong> — The instruction or question you give to an AI model.</p>
+      <p><strong>Zero-shot</strong> — Giving a direct instruction with no examples.</p>
+      <p><strong>Few-shot</strong> — Providing examples alongside your instruction to guide the format or style.</p>
+      <p><strong>Chain-of-thought</strong> — Asking the AI to reason step by step.</p>
+      <p><strong>Role prompting</strong> — Assigning a persona (e.g., "Act as an academic editor").</p>
+      <p><strong>Iterative prompting</strong> — Refining output across multiple exchanges in a conversation.</p>
+      <p><strong>Human agency</strong> — The writer's responsibility to direct, evaluate, and own the final output.</p>
+    </div>
+  </details>
+
+  <p class="back-top" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑ Back to top</p>
+</div>
+</div>
+
+
+<!-- ══════════ WRITING PROCESS ══════════ -->
+<div class="tab-panel" id="tab-writing">
+<div class="container">
+  <p class="section-intro">GenAI can support each stage of the writing process — but always with <strong>human oversight</strong>. Below is how AI fits into each phase, with practical examples and cautions.</p>
+
+  <p class="section-label">The four stages</p>
+
+    <!-- PREWRITING -->
+    <details class="accordion">
+      <summary><span class="role-chip" style="background:var(--purple);">Stage 1</span> 🧠 Prewriting</summary>
+      <div class="accordion-body">
+        <p>Brainstorm ideas, create outlines, and explore concepts. AI can help generate topic angles, suggest structures, and explain unfamiliar concepts.</p>
+        <div class="callout warn" style="margin-top:12px;">
+          <span>⚠️</span>
+          <span><strong>Caution:</strong> Don't offload your thinking. Use AI to <em>spark</em> ideas, not to <em>replace</em> your own critical analysis.</span>
+        </div>
+        <p class="examples-label">Example prompts</p>
+        <div class="example-item"><span class="verb">Brainstorm</span> five possible angles for an essay on urban migration in Finland.</div>
+        <div class="example-item"><span class="verb">Outline</span> a structure for a 2,000-word literature review on renewable energy policy.</div>
+      </div>
+    </details>
+
+    <!-- DRAFTING -->
+    <details class="accordion">
+      <summary><span class="role-chip" style="background:var(--blue);">Stage 2</span> ✍️ Drafting</summary>
+      <div class="accordion-body">
+        <p>Overcome writer's block, find better vocabulary, and propose transitions between paragraphs. AI can suggest phrasing, but the argument and structure should be yours.</p>
+        <p class="examples-label">Example prompts</p>
+        <div class="example-item"><span class="verb">Suggest</span> three academic transition phrases to connect a paragraph about causes to one about effects.</div>
+        <div class="example-item"><span class="verb">Rephrase</span> this sentence in a more formal academic register: "People really don't like climate change."</div>
+      </div>
+    </details>
+
+    <!-- REVISING -->
+    <details class="accordion">
+      <summary><span class="role-chip" style="background:var(--green);">Stage 3</span> 🔍 Revising</summary>
+      <div class="accordion-body">
+        <p>Check logical flow, clarify arguments, and adjust tone. AI can read your draft and point out structural weaknesses or unclear reasoning.</p>
+        <p class="examples-label">Example prompts</p>
+        <div class="example-item"><span class="verb">Review</span> this paragraph for logical consistency and <span class="verb">suggest</span> improvements.</div>
+        <div class="example-item"><span class="verb">Identify</span> the weakest argument in my essay and <span class="verb">explain</span> why it's weak.</div>
+      </div>
+    </details>
+
+    <!-- EDITING & PROOFREADING -->
+    <details class="accordion">
+      <summary><span class="role-chip" style="background:var(--orange);">Stage 4</span> 📝 Editing &amp; Proofreading</summary>
+      <div class="accordion-body">
+        <p>Spot grammar errors, ensure consistent formatting, and check citation style. This is where AI is most straightforward — but always ask it to <strong>explain</strong> the errors so you learn.</p>
+        <div class="callout tip" style="margin-top:12px;">
+          <span>💡</span>
+          <span><strong>Tip:</strong> Ask AI to explain errors, not just fix them. "Why is this sentence incorrect?" teaches you more than "Fix this."</span>
+        </div>
+        <p class="examples-label">Example prompts</p>
+        <div class="example-item"><span class="verb">Proofread</span> this paragraph and <span class="verb">explain</span> each grammar error you find.</div>
+        <div class="example-item"><span class="verb">Check</span> whether my in-text citations follow APA 7th edition format.</div>
+      </div>
+    </details>
+
+  <div class="agency-banner">
+    <div class="icon">🧑‍💻</div>
+    <div>
+      <h3>Human Agency Runs Through Every Stage</h3>
+      <p>The cycle is not linear — you may loop between revising and drafting, or return to prewriting after a failed draft. At every point, <strong>you</strong> decide what to keep, what to cut, and what to rethink. AI supports; you lead.</p>
+    </div>
+  </div>
+
+  <p class="back-top" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑ Back to top</p>
+</div>
+</div>
+
+
+<!-- ══════════ PROMPTING TECHNIQUES ══════════ -->
+<div class="tab-panel" id="tab-prompting">
+<div class="container">
+  <p class="section-intro">Think of prompting as <strong>giving directions</strong>. The clearer and more specific your instructions, the better the result. Here are five techniques, from simplest to most advanced.</p>
+
+  <p class="section-label">The five techniques</p>
+
+  <div class="tech-grid" style="grid-template-columns: 1fr 1fr;">
+
+    <!-- ZERO-SHOT -->
+    <div class="tech-card">
+      <h3>🎯 1. Zero-Shot</h3>
+      <p>Give a direct instruction with <strong>no examples</strong>. Best for simple, clear-cut tasks.</p>
+      <div class="tech-example">"List three effects of urbanisation on mental health."</div>
+    </div>
+
+    <!-- FEW-SHOT -->
+    <div class="tech-card highlight">
+      <h3>📋 2. Few-Shot</h3>
+      <p>Provide <strong>examples</strong> alongside your instruction to guide the AI's style, format, or reasoning pattern.</p>
+      <div class="tech-example">"Summarise the following articles in the style of these two examples: [Example 1] [Example 2]."</div>
+    </div>
+
+    <!-- CHAIN-OF-THOUGHT -->
+    <div class="tech-card caution">
+      <h3>⚙️ 3. Chain-of-Thought</h3>
+      <p>Ask the AI to <strong>reason step by step</strong>. This improves accuracy for complex or multi-step tasks.</p>
+      <div class="tech-example">"Analyse this argument step by step. First identify the claim, then the evidence, then evaluate the reasoning."</div>
+    </div>
+
+    <!-- ROLE PROMPTING -->
+    <div class="tech-card advanced">
+      <h3>🎭 4. Role Prompting</h3>
+      <p>Assign a <strong>persona</strong> to the AI. This shapes the tone, vocabulary, and perspective of the response.</p>
+      <div class="tech-example">"Act as an academic editor. Review my introduction for clarity and coherence."</div>
+    </div>
+
+    <!-- ITERATIVE PROMPTING -->
+    <div class="tech-card" style="border-top-color: var(--orange);">
+      <h3>🔄 5. Iterative Prompting</h3>
+      <p><strong>Refine output through conversation.</strong> Don't accept the first response — follow up, narrow down, and improve.</p>
+      <div class="tech-example">"Good start, but make it more concise and add a counter-argument in the second paragraph."</div>
+    </div>
+
+  </div>
+
+  <p class="section-label">How they connect</p>
+
+  <div class="callout info">
+    <span>ℹ️</span>
+    <span>These techniques are not mutually exclusive. A strong prompt often <strong>combines</strong> several: you might use <em>role prompting</em> + <em>few-shot</em> + <em>chain-of-thought</em> in a single instruction. Iterative prompting is always layered on top.</span>
+  </div>
+
+  <details class="accordion">
+    <summary>🔗 Combined example</summary>
+    <div class="accordion-body">
+      <p class="examples-label">Prompt</p>
+      <div class="example-item"><span class="verb">Act as</span> an academic writing tutor (role). <span class="verb">Analyse</span> the following paragraph step by step (chain-of-thought). Use the format shown in this example (few-shot): [Example]. Focus on argument structure and coherence.</div>
+      <p>Then, based on the AI's response, you might follow up (iterative): "Now focus specifically on the transition between paragraphs 2 and 3."</p>
+    </div>
+  </details>
+
+  <p class="section-label">Quick reference</p>
+
+  <table style="width:100%;border-collapse:collapse;font-size:13px;margin:10px 0;">
+    <thead>
+      <tr style="background:var(--gray-100);">
+        <th style="padding:8px 12px;text-align:left;font-weight:600;color:var(--gray-700);border-bottom:2px solid var(--gray-200);">Technique</th>
+        <th style="padding:8px 12px;text-align:left;font-weight:600;color:var(--gray-700);border-bottom:2px solid var(--gray-200);">Best for</th>
+        <th style="padding:8px 12px;text-align:left;font-weight:600;color:var(--gray-700);border-bottom:2px solid var(--gray-200);">Key phrase</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td style="padding:8px 12px;border-bottom:1px solid var(--gray-100);">Zero-shot</td><td style="padding:8px 12px;border-bottom:1px solid var(--gray-100);">Simple, clear tasks</td><td style="padding:8px 12px;border-bottom:1px solid var(--gray-100);font-family:'JetBrains Mono',monospace;font-size:12px;">"List…" / "Define…"</td></tr>
+      <tr><td style="padding:8px 12px;border-bottom:1px solid var(--gray-100);">Few-shot</td><td style="padding:8px 12px;border-bottom:1px solid var(--gray-100);">Format/style control</td><td style="padding:8px 12px;border-bottom:1px solid var(--gray-100);font-family:'JetBrains Mono',monospace;font-size:12px;">"Like this example…"</td></tr>
+      <tr><td style="padding:8px 12px;border-bottom:1px solid var(--gray-100);">Chain-of-thought</td><td style="padding:8px 12px;border-bottom:1px solid var(--gray-100);">Complex reasoning</td><td style="padding:8px 12px;border-bottom:1px solid var(--gray-100);font-family:'JetBrains Mono',monospace;font-size:12px;">"Step by step…"</td></tr>
+      <tr><td style="padding:8px 12px;border-bottom:1px solid var(--gray-100);">Role prompting</td><td style="padding:8px 12px;border-bottom:1px solid var(--gray-100);">Tone/perspective shaping</td><td style="padding:8px 12px;border-bottom:1px solid var(--gray-100);font-family:'JetBrains Mono',monospace;font-size:12px;">"Act as…"</td></tr>
+      <tr><td style="padding:8px 12px;">Iterative</td><td style="padding:8px 12px;">Refinement</td><td style="padding:8px 12px;font-family:'JetBrains Mono',monospace;font-size:12px;">"Now adjust…" / "Make it…"</td></tr>
+    </tbody>
+  </table>
+
+  <p class="back-top" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑ Back to top</p>
+</div>
+</div>
+
+
+<!-- ══════════ CHALLENGE QUIZ ══════════ -->
+<div class="tab-panel" id="tab-quiz">
+<div class="container">
+  <p class="section-intro">Test your understanding of GenAI in writing and prompting techniques. Select the best answer for each question.</p>
+
+  <p class="section-label">Quiz</p>
+
+  <div id="quiz-container">
+
+    <!-- Q1 -->
+    <div class="quiz-question" data-correct="1">
+      <h3>1. During which writing stage should you be most cautious about "offloading thinking" to AI?</h3>
+      <div class="quiz-options">
+        <button class="quiz-option" data-index="0">Editing &amp; proofreading</button>
+        <button class="quiz-option" data-index="1">Prewriting</button>
+        <button class="quiz-option" data-index="2">Revising</button>
+        <button class="quiz-option" data-index="3">Drafting</button>
+      </div>
+      <div class="quiz-feedback"></div>
+    </div>
+
+    <!-- Q2 -->
+    <div class="quiz-question" data-correct="2">
+      <h3>2. What is "few-shot" prompting?</h3>
+      <div class="quiz-options">
+        <button class="quiz-option" data-index="0">Asking the AI to take only a few seconds to respond</button>
+        <button class="quiz-option" data-index="1">Giving a direct instruction with no examples</button>
+        <button class="quiz-option" data-index="2">Providing examples to guide the AI's style or format</button>
+        <button class="quiz-option" data-index="3">Assigning a role or persona to the AI</button>
+      </div>
+      <div class="quiz-feedback"></div>
+    </div>
+
+    <!-- Q3 -->
+    <div class="quiz-question" data-correct="0">
+      <h3>3. Which prompting technique is best suited for complex, multi-step analytical tasks?</h3>
+      <div class="quiz-options">
+        <button class="quiz-option" data-index="0">Chain-of-thought</button>
+        <button class="quiz-option" data-index="1">Zero-shot</button>
+        <button class="quiz-option" data-index="2">Few-shot</button>
+        <button class="quiz-option" data-index="3">Role prompting</button>
+      </div>
+      <div class="quiz-feedback"></div>
+    </div>
+
+    <!-- Q4 -->
+    <div class="quiz-question" data-correct="3">
+      <h3>4. Why should you ask AI to <em>explain</em> grammar errors rather than just fix them?</h3>
+      <div class="quiz-options">
+        <button class="quiz-option" data-index="0">It produces a longer response</button>
+        <button class="quiz-option" data-index="1">AI fixes are usually incorrect</button>
+        <button class="quiz-option" data-index="2">It makes the AI work harder</button>
+        <button class="quiz-option" data-index="3">You learn from the explanation and improve your own writing</button>
+      </div>
+      <div class="quiz-feedback"></div>
+    </div>
+
+    <!-- Q5 -->
+    <div class="quiz-question" data-correct="1">
+      <h3>5. "Act as an academic editor. Review my introduction step by step, using this example as a model." Which techniques does this prompt combine?</h3>
+      <div class="quiz-options">
+        <button class="quiz-option" data-index="0">Zero-shot + iterative</button>
+        <button class="quiz-option" data-index="1">Role prompting + chain-of-thought + few-shot</button>
+        <button class="quiz-option" data-index="2">Few-shot + zero-shot</button>
+        <button class="quiz-option" data-index="3">Iterative + role prompting</button>
+      </div>
+      <div class="quiz-feedback"></div>
+    </div>
+
+    <!-- Q6 -->
+    <div class="quiz-question" data-correct="2">
+      <h3>6. What does "human agency" mean in the context of AI-assisted writing?</h3>
+      <div class="quiz-options">
+        <button class="quiz-option" data-index="0">Humans should avoid using AI entirely</button>
+        <button class="quiz-option" data-index="1">A human should always press the "send" button</button>
+        <button class="quiz-option" data-index="2">The writer directs the process, evaluates output, and owns the final text</button>
+        <button class="quiz-option" data-index="3">A recruitment agency that provides human workers</button>
+      </div>
+      <div class="quiz-feedback"></div>
+    </div>
+
+    <!-- Q7 -->
+    <div class="quiz-question" data-correct="3">
+      <h3>7. Iterative prompting means:</h3>
+      <div class="quiz-options">
+        <button class="quiz-option" data-index="0">Using the same prompt multiple times</button>
+        <button class="quiz-option" data-index="1">Writing your prompt in a loop structure</button>
+        <button class="quiz-option" data-index="2">Asking the AI to iterate through a dataset</button>
+        <button class="quiz-option" data-index="3">Refining output through a back-and-forth conversation</button>
+      </div>
+      <div class="quiz-feedback"></div>
+    </div>
+
+    <!-- Q8 -->
+    <div class="quiz-question" data-correct="0">
+      <h3>8. Which of the following is a zero-shot prompt?</h3>
+      <div class="quiz-options">
+        <button class="quiz-option" data-index="0">"List three effects of deforestation on biodiversity."</button>
+        <button class="quiz-option" data-index="1">"Summarise this article like Example A and Example B."</button>
+        <button class="quiz-option" data-index="2">"Act as a biologist and explain this step by step."</button>
+        <button class="quiz-option" data-index="3">"Good, now make it more concise."</button>
+      </div>
+      <div class="quiz-feedback"></div>
+    </div>
+
+  </div>
+
+  <div class="quiz-score" id="quiz-score" style="display:none;">
+    <div class="score-number" id="score-display">0 / 8</div>
+    <div class="score-label">Questions answered correctly</div>
+    <button class="reset-btn" onclick="resetQuiz()">Try Again</button>
+  </div>
+
+  <p class="back-top" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑ Back to top</p>
+</div>
+</div>
+
+
+<!-- ══════════ SOURCES ══════════ -->
+<div class="tab-panel" id="tab-sources">
+<div class="container">
+  <p class="section-intro">Sources and further reading on GenAI in academic writing and prompting techniques.</p>
+
+  <details class="accordion">
+    <summary>📚 Dobrin, S. I. — AI and Writing</summary>
+    <div class="accordion-body">
+      <a class="source-link" href="https://broadviewpress.com/product/ai-and-writing/" target="_blank">Broadview Press — AI and Writing</a>
+      <p>A practical guide to using GenAI in academic, professional, and personal writing. Dobrin examines both the conceptual and applied dimensions — ethics, authorship, bias — and offers exercises for integrating AI responsibly into the writing process.</p>
+    </div>
+  </details>
+
+  <details class="accordion">
+    <summary>📚 Learn Prompting</summary>
+    <div class="accordion-body">
+      <a class="source-link" href="https://learnprompting.org/docs/introduction" target="_blank">learnprompting.org — Introduction</a>
+      <p>Open-source guide covering zero-shot, few-shot, chain-of-thought, and other prompting techniques with examples and research references.</p>
+    </div>
+  </details>
+
+  <details class="accordion">
+    <summary>📚 University of Helsinki — Elements of AI</summary>
+    <div class="accordion-body">
+      <a class="source-link" href="https://www.elementsofai.com/" target="_blank">elementsofai.com</a>
+      <p>Free online course on AI fundamentals, suitable for building foundational understanding of how AI systems work.</p>
+    </div>
+  </details>
+
+  <p class="back-top" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑ Back to top</p>
+</div>
+</div>
+
+
+<!-- FOOTER -->
+<footer class="page-footer">
+  GenAI in Writing &amp; Prompting Techniques &nbsp;·&nbsp;
+  <a href="https://www.linkedin.com/in/hagu1/" target="_blank">Hamid Guedra</a> &nbsp;·&nbsp;
+  <a href="https://lab.fi/en" target="_blank">LAB University of Applied Sciences</a>
+</footer>
+
+<script>
+// Tab switching
+document.querySelectorAll('.tab-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('tab-' + btn.dataset.tab).classList.add('active');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+});
+
+// Quiz logic
+const feedbackMap = {
+  0: { correct: "Correct! Prewriting is where you form your own ideas — relying on AI here risks offloading your critical thinking.", incorrect: "Not quite. While AI can help at all stages, prewriting is where the risk of offloading your own thinking is highest." },
+  1: { correct: "Correct! Few-shot prompting uses examples to guide the AI's output style or format.", incorrect: "Not quite. Few-shot prompting means providing examples alongside your instruction." },
+  2: { correct: "Correct! Chain-of-thought prompting asks the AI to reason step by step, which improves accuracy on complex tasks.", incorrect: "Not quite. Chain-of-thought is specifically designed for complex reasoning that benefits from step-by-step analysis." },
+  3: { correct: "Correct! Explanations help you learn and improve, rather than just getting a quick fix.", incorrect: "Not quite. The key benefit is learning — understanding your errors helps you avoid them next time." },
+  4: { correct: "Correct! \"Act as\" = role prompting, \"step by step\" = chain-of-thought, \"using this example\" = few-shot.", incorrect: "Look for the key phrases: \"Act as\" (role), \"step by step\" (chain-of-thought), and \"using this example\" (few-shot)." },
+  5: { correct: "Correct! Human agency means you stay in control — directing the process, evaluating AI output, and taking responsibility for the final text.", incorrect: "Not quite. Human agency means the writer directs, evaluates, and owns the work — AI supports, but you lead." },
+  6: { correct: "Correct! Iterative prompting is a back-and-forth conversation where you refine and improve the AI's output.", incorrect: "Not quite. Iterative prompting means refining output through multiple conversational exchanges." },
+  7: { correct: "Correct! A simple, direct instruction with no examples is zero-shot prompting.", incorrect: "Not quite. A zero-shot prompt is a direct instruction with no examples provided." }
+};
+
+let answered = 0;
+let score = 0;
+const totalQuestions = document.querySelectorAll('.quiz-question').length;
+
+document.querySelectorAll('.quiz-question').forEach((q, qIndex) => {
+  const correctIndex = parseInt(q.dataset.correct);
+  const options = q.querySelectorAll('.quiz-option');
+  const feedback = q.querySelector('.quiz-feedback');
+
+  options.forEach(opt => {
+    opt.addEventListener('click', () => {
+      if (q.dataset.answered) return;
+      q.dataset.answered = 'true';
+      answered++;
+
+      const selected = parseInt(opt.dataset.index);
+      const isCorrect = selected === correctIndex;
+
+      if (isCorrect) {
+        score++;
+        opt.classList.add('correct');
+        feedback.className = 'quiz-feedback show correct-fb';
+        feedback.textContent = feedbackMap[qIndex].correct;
+      } else {
+        opt.classList.add('incorrect');
+        opt.classList.add('shake');
+        setTimeout(() => opt.classList.remove('shake'), 400);
+        options[correctIndex].classList.add('correct');
+        feedback.className = 'quiz-feedback show incorrect-fb';
+        feedback.textContent = feedbackMap[qIndex].incorrect;
+      }
+
+      options.forEach(o => o.classList.add('disabled'));
+
+      if (answered === totalQuestions) {
+        const scoreEl = document.getElementById('quiz-score');
+        scoreEl.style.display = 'block';
+        document.getElementById('score-display').textContent = score + ' / ' + totalQuestions;
+      }
+    });
+  });
+});
+
+function resetQuiz() {
+  answered = 0;
+  score = 0;
+  document.querySelectorAll('.quiz-question').forEach(q => {
+    delete q.dataset.answered;
+    q.querySelectorAll('.quiz-option').forEach(o => {
+      o.classList.remove('correct', 'incorrect', 'disabled', 'shake');
+    });
+    const fb = q.querySelector('.quiz-feedback');
+    fb.className = 'quiz-feedback';
+    fb.textContent = '';
+  });
+  document.getElementById('quiz-score').style.display = 'none';
+}
+</script>
+</body>
+</html>

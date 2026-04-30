@@ -1,0 +1,1009 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>AI: History, Concepts &amp; Metaphors</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet"/>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --blue:        #1a56db;
+  --blue-light:  #e8f0fe;
+  --blue-dark:   #1e3a8a;
+  --green:       #057a55;
+  --green-light: #def7ec;
+  --yellow:      #c27803;
+  --yellow-light:#fdf6b2;
+  --orange:      #c2500a;
+  --purple:      #7c3aed;
+  --purple-light:#ede9fe;
+  --red:         #dc2626;
+  --red-light:   #fee2e2;
+  --gray-50:     #f9fafb;
+  --gray-100:    #f3f4f6;
+  --gray-200:    #e5e7eb;
+  --gray-400:    #9ca3af;
+  --gray-600:    #4b5563;
+  --gray-700:    #374151;
+  --gray-800:    #1f2937;
+  --gray-900:    #111827;
+  --radius:      8px;
+}
+
+body {
+  font-family: 'Inter', sans-serif;
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--gray-800);
+  background: var(--gray-50);
+}
+
+/* ── SITE HEADER ── */
+.site-header {
+  background: white;
+  border-bottom: 1px solid var(--gray-200);
+  padding: 12px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 1px 3px rgba(0,0,0,.06);
+}
+.site-header .course-name { font-size: 13px; font-weight: 600; color: var(--gray-600); }
+.site-header .course-name a { color: var(--blue); text-decoration: none; }
+.site-header .course-name a:hover { text-decoration: underline; }
+.site-header .inst { font-size: 12px; color: var(--gray-400); }
+.site-header .inst a { color: var(--gray-400); text-decoration: none; }
+.site-header .inst a:hover { text-decoration: underline; color: var(--gray-600); }
+
+/* ── HERO ── */
+.hero {
+  background: linear-gradient(135deg, #1e3a8a 0%, #1a56db 60%, #2563eb 100%);
+  color: white;
+  padding: 48px 24px 40px;
+  text-align: center;
+}
+.hero h1 { font-size: clamp(22px, 4vw, 30px); font-weight: 700; margin-bottom: 8px; }
+.hero .subtitle { font-size: 15px; opacity: .75; margin-bottom: 24px; }
+.badges { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-bottom: 20px; }
+.badge { background: rgba(255,255,255,.18); border: 1px solid rgba(255,255,255,.3); border-radius: 999px; padding: 4px 14px; font-size: 13px; font-weight: 500; }
+.credit { font-size: 12px; opacity: .55; }
+.credit a { color: white; }
+
+/* ── STICKY TAB BAR ── */
+.tabs-bar {
+  background: white;
+  border-bottom: 2px solid var(--gray-200);
+  display: flex;
+  overflow-x: auto;
+  scrollbar-width: none;
+  position: sticky;
+  top: 45px;
+  z-index: 99;
+  justify-content: center;
+}
+.tabs-bar::-webkit-scrollbar { display: none; }
+.tab-btn {
+  padding: 14px 18px; font-size: 13px; font-weight: 600; color: var(--gray-600);
+  border: none; background: none; cursor: pointer; white-space: nowrap;
+  border-bottom: 2px solid transparent; margin-bottom: -2px;
+  transition: color .15s, border-color .15s; font-family: 'Inter', sans-serif;
+}
+.tab-btn:hover { color: var(--blue); }
+.tab-btn.active { color: var(--blue); border-bottom-color: var(--blue); }
+
+/* ── PANELS ── */
+.tab-panel { display: none; }
+.tab-panel.active { display: block; }
+.container { max-width: 900px; margin: 0 auto; padding: 32px 20px 80px; }
+
+/* ── SECTION HEADINGS ── */
+.section-label {
+  font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase;
+  color: var(--gray-600); margin: 28px 0 10px; padding-bottom: 8px;
+  border-bottom: 1px solid var(--gray-200);
+}
+.section-intro { font-size: 14px; color: var(--gray-600); margin-bottom: 20px; line-height: 1.7; }
+
+/* ── ACCORDION ── */
+.accordion { border: 1px solid #b2dce8; border-radius: var(--radius); margin-bottom: 10px; background: white; overflow: hidden; }
+.accordion summary {
+  padding: 14px 18px; font-weight: 600; font-size: 14px; cursor: pointer;
+  display: flex; align-items: center; gap: 8px; list-style: none;
+  user-select: none; background: #e8f6f9; color: #1a4a56;
+}
+.accordion summary::-webkit-details-marker { display: none; }
+.accordion summary::after { content: '▾'; margin-left: auto; font-size: 12px; color: #4a8fa0; transition: transform .2s; }
+.accordion[open] summary::after { transform: rotate(180deg); }
+.accordion summary:hover { background: #d4eef4; }
+.accordion-body { padding: 0 18px 18px; border-top: 1px solid #b2dce8; font-size: 14px; color: var(--gray-700); }
+.accordion-body p { margin-top: 10px; }
+
+/* ── CALLOUTS ── */
+.callout { border-radius: var(--radius); padding: 12px 16px; margin: 14px 0; font-size: 13.5px; display: flex; gap: 10px; }
+.callout.info    { background: var(--blue-light);    border-left: 3px solid var(--blue);   color: #1e3a8a; }
+.callout.warn    { background: var(--yellow-light);  border-left: 3px solid var(--yellow); color: #78350f; }
+.callout.success { background: var(--green-light);   border-left: 3px solid var(--green);  color: #064e3b; }
+.callout.tip     { background: #e8f6f9; border-left: 3px solid #4a8fa0; color: #1a4a56; }
+.callout.error   { background: var(--red-light);     border-left: 3px solid var(--red);    color: #7f1d1d; }
+
+/* ── INTERACTIVE TIMELINE ── */
+.timeline {
+  position: relative;
+  padding: 20px 0;
+  margin: 16px 0;
+}
+.timeline::before {
+  content: '';
+  position: absolute;
+  left: 28px;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: linear-gradient(to bottom, var(--blue), var(--purple));
+  border-radius: 2px;
+}
+.tl-item {
+  position: relative;
+  padding-left: 64px;
+  margin-bottom: 0;
+  cursor: pointer;
+}
+.tl-dot {
+  position: absolute;
+  left: 18px;
+  top: 14px;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: white;
+  border: 3px solid var(--blue);
+  z-index: 2;
+  transition: background .2s, border-color .2s, transform .2s;
+}
+.tl-item.active .tl-dot,
+.tl-item:hover .tl-dot {
+  background: var(--blue);
+  border-color: var(--blue-dark);
+  transform: scale(1.2);
+}
+.tl-item.active .tl-dot { background: var(--purple); border-color: var(--purple); }
+.tl-year {
+  font-size: 13px;
+  font-weight: 700;
+  font-family: 'JetBrains Mono', monospace;
+  color: var(--blue);
+  margin-bottom: 2px;
+}
+.tl-item.active .tl-year { color: var(--purple); }
+.tl-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--gray-800);
+  margin-bottom: 4px;
+}
+.tl-detail {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height .35s ease, padding .35s ease;
+  font-size: 13px;
+  color: var(--gray-600);
+  line-height: 1.7;
+  padding-bottom: 0;
+}
+.tl-item.active .tl-detail {
+  max-height: 300px;
+  padding-bottom: 20px;
+}
+.tl-detail-inner {
+  background: var(--gray-100);
+  border: 1px solid var(--gray-200);
+  border-radius: 6px;
+  padding: 10px 14px;
+  margin-top: 6px;
+}
+
+/* ── CONCEPT CARDS ── */
+.concept-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  margin: 16px 0;
+}
+@media (max-width: 600px) {
+  .concept-grid { grid-template-columns: 1fr; }
+}
+.concept-card {
+  background: white;
+  border: 1px solid var(--gray-200);
+  border-radius: var(--radius);
+  padding: 18px;
+  border-top: 3px solid var(--blue);
+  transition: box-shadow .2s, transform .2s;
+}
+.concept-card:hover {
+  box-shadow: 0 4px 12px rgba(0,0,0,.08);
+  transform: translateY(-2px);
+}
+.concept-card.narrow  { border-top-color: var(--green); }
+.concept-card.general { border-top-color: var(--purple); }
+.concept-card.genai   { border-top-color: var(--orange); }
+.concept-card h3 {
+  font-size: 14px; font-weight: 700; color: var(--gray-800); margin-bottom: 4px;
+  display: flex; align-items: center; gap: 6px;
+}
+.concept-card p { font-size: 13px; color: var(--gray-600); line-height: 1.6; }
+.concept-card .example-list {
+  margin-top: 8px;
+  font-size: 12px;
+  color: var(--gray-700);
+  font-family: 'JetBrains Mono', monospace;
+  background: var(--gray-100);
+  border: 1px solid var(--gray-200);
+  border-radius: 6px;
+  padding: 6px 10px;
+  line-height: 1.5;
+}
+
+/* ── METAPHOR CARDS ── */
+.metaphor-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 14px;
+  margin: 16px 0;
+}
+.metaphor-card {
+  background: white;
+  border: 1px solid var(--gray-200);
+  border-radius: var(--radius);
+  padding: 20px;
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+  transition: box-shadow .2s, transform .2s;
+}
+.metaphor-card:hover {
+  box-shadow: 0 4px 12px rgba(0,0,0,.08);
+  transform: translateY(-2px);
+}
+.metaphor-icon {
+  font-size: 32px;
+  flex-shrink: 0;
+  width: 56px;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius);
+  background: var(--gray-100);
+}
+.metaphor-card h3 { font-size: 15px; font-weight: 700; color: var(--gray-800); margin-bottom: 4px; }
+.metaphor-card .metaphor-subtitle { font-size: 12px; color: var(--gray-400); font-weight: 600; text-transform: uppercase; letter-spacing: .05em; margin-bottom: 6px; }
+.metaphor-card p { font-size: 13px; color: var(--gray-600); line-height: 1.6; }
+
+/* ── QUIZ ── */
+.quiz-question {
+  background: white;
+  border: 1px solid var(--gray-200);
+  border-radius: var(--radius);
+  padding: 20px;
+  margin-bottom: 16px;
+}
+.quiz-question h3 { font-size: 14px; font-weight: 600; color: var(--gray-800); margin-bottom: 12px; }
+.quiz-options { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+@media (max-width: 500px) { .quiz-options { grid-template-columns: 1fr; } }
+.quiz-option {
+  padding: 10px 14px; border: 2px solid var(--gray-200); border-radius: var(--radius);
+  background: white; cursor: pointer; font-size: 13px; font-family: 'Inter', sans-serif;
+  color: var(--gray-700); transition: border-color .15s, background .15s; text-align: left;
+}
+.quiz-option:hover { border-color: var(--blue); background: var(--blue-light); }
+.quiz-option.correct { border-color: var(--green); background: var(--green-light); color: #064e3b; }
+.quiz-option.incorrect { border-color: var(--red); background: var(--red-light); color: #7f1d1d; }
+.quiz-option.disabled { pointer-events: none; opacity: 0.7; }
+.quiz-feedback { margin-top: 10px; font-size: 13px; padding: 8px 12px; border-radius: 6px; display: none; }
+.quiz-feedback.show { display: block; }
+.quiz-feedback.correct-fb { background: var(--green-light); color: #064e3b; border-left: 3px solid var(--green); }
+.quiz-feedback.incorrect-fb { background: var(--red-light); color: #7f1d1d; border-left: 3px solid var(--red); }
+.quiz-score { background: white; border: 1px solid var(--gray-200); border-radius: var(--radius); padding: 20px; text-align: center; margin-top: 20px; }
+.quiz-score .score-number { font-size: 28px; font-weight: 700; color: var(--blue); }
+.quiz-score .score-label { font-size: 13px; color: var(--gray-600); }
+.reset-btn {
+  display: inline-block; margin-top: 12px; padding: 8px 20px; background: var(--blue);
+  color: white; border: none; border-radius: var(--radius); font-size: 13px; font-weight: 600;
+  font-family: 'Inter', sans-serif; cursor: pointer; transition: background .15s;
+}
+.reset-btn:hover { background: var(--blue-dark); }
+
+/* ── SHAKE ── */
+@keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-6px); } 75% { transform: translateX(6px); } }
+.shake { animation: shake .35s ease both; }
+
+/* ── ROLE CHIPS ── */
+.role-chip { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .07em; border-radius: 999px; padding: 2px 9px; color: white; display: inline-block; }
+
+/* ── SOURCE LINK ── */
+.source-link { display: inline-block; margin-top: 8px; font-size: 13px; color: var(--blue); }
+
+/* ── BACK TO TOP ── */
+.back-top { display: inline-block; margin-top: 24px; font-size: 13px; color: var(--blue); cursor: pointer; }
+a { color: var(--blue); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+/* ── FOOTER ── */
+.page-footer { text-align: center; padding: 24px; font-size: 12px; color: var(--gray-400); border-top: 1px solid var(--gray-200); margin-top: 40px; }
+.page-footer a { color: var(--gray-600); text-decoration: none; }
+.page-footer a:hover { text-decoration: underline; }
+
+/* ── UMBRELLA DIAGRAM ── */
+.umbrella-diagram {
+  text-align: center;
+  margin: 20px 0;
+  padding: 24px;
+  background: white;
+  border: 1px solid var(--gray-200);
+  border-radius: var(--radius);
+}
+.umbrella-top {
+  display: inline-block;
+  background: linear-gradient(135deg, #1e3a8a, #7c3aed);
+  color: white;
+  font-weight: 700;
+  font-size: 16px;
+  padding: 14px 32px;
+  border-radius: 999px 999px 0 0;
+  margin-bottom: 0;
+}
+.umbrella-stem {
+  width: 3px;
+  height: 24px;
+  background: var(--gray-400);
+  margin: 0 auto;
+}
+.umbrella-branches {
+  display: flex;
+  justify-content: center;
+  gap: 24px;
+  margin-top: 12px;
+  flex-wrap: wrap;
+}
+.branch-box {
+  border: 2px solid var(--gray-200);
+  border-radius: var(--radius);
+  padding: 12px 18px;
+  min-width: 160px;
+  background: var(--gray-50);
+  transition: transform .2s, box-shadow .2s;
+}
+.branch-box:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,.08);
+}
+.branch-box h4 { font-size: 13px; font-weight: 700; color: var(--gray-800); margin-bottom: 2px; }
+.branch-box p { font-size: 12px; color: var(--gray-600); }
+.branch-box.narrow { border-color: var(--green); }
+.branch-box.general { border-color: var(--purple); }
+.branch-box.genai-branch { border-color: var(--orange); }
+/* ── NAV BAR ── */
+.site-header { flex-wrap: wrap; gap: 8px; }
+.site-nav { display: flex; gap: 4px; align-items: center; }
+.site-nav a {
+  font-size: 12px; font-weight: 500; color: var(--gray-600);
+  padding: 4px 10px; border-radius: 999px; text-decoration: none;
+  transition: background .15s, color .15s; white-space: nowrap;
+}
+.site-nav a:hover { background: var(--blue-light); color: var(--blue); text-decoration: none; }
+.site-nav a.current { background: var(--blue); color: white; pointer-events: none; }
+.nav-sep { color: var(--gray-200); font-size: 14px; user-select: none; }
+</style>
+</head>
+<body>
+
+<!-- SITE HEADER -->
+<header class="site-header">
+  <div>
+    <div class="course-name">English &amp; AI &nbsp;·&nbsp; <a href="https://www.linkedin.com/in/hagu1/" target="_blank">Hamid Guedra</a></div>
+    <div class="inst"><a href="https://lab.fi/en" target="_blank">LAB University of Applied Sciences</a></div>
+  </div>
+  <nav class="site-nav">
+    <a href="index.html">🏠 Home</a>
+    <a href="ai-history-concepts-metaphors.html" class="current">History &amp; Concepts</a>
+    <a href="ai-risks-ethics.html">Risks &amp; Ethics</a>
+    <a href="ai-writing-prompting.html">Writing &amp; Prompting</a>
+  </nav>
+</header>
+
+<!-- HERO -->
+<div class="hero">
+  <h1>AI: History, Concepts &amp; Metaphors</h1>
+  <p class="subtitle">An interactive guide to the foundations of Artificial Intelligence</p>
+  <div class="badges">
+    <span class="badge">AI Literacy</span>
+    <span class="badge">Key Concepts</span>
+    <span class="badge">Interactive Timeline</span>
+  </div>
+  <div class="credit">
+    Designed by <a href="https://www.linkedin.com/in/hagu1/" target="_blank">Hamid Guedra</a> &nbsp;·&nbsp;
+    <a href="https://lab.fi/en" target="_blank">LAB University of Applied Sciences</a> &nbsp;·&nbsp;
+    Generated with Claude 4.6
+  </div>
+</div>
+
+<!-- TAB BAR -->
+<nav class="tabs-bar">
+  <button class="tab-btn active" data-tab="overview">📖 Overview</button>
+  <button class="tab-btn" data-tab="timeline">🕰️ History</button>
+  <button class="tab-btn" data-tab="concepts">🧠 Concepts</button>
+  <button class="tab-btn" data-tab="metaphors">🎨 Metaphors</button>
+  <button class="tab-btn" data-tab="quiz">📝 Quiz</button>
+  <button class="tab-btn" data-tab="sources">📚 Sources</button>
+</nav>
+
+
+<!-- ══════════ OVERVIEW ══════════ -->
+<div class="tab-panel active" id="tab-overview">
+<div class="container">
+  <p class="section-intro">This tool covers three connected areas of AI literacy: the <strong>history</strong> of how AI developed, the <strong>core concepts</strong> that organise the field, and the <strong>metaphors</strong> commonly used to describe how AI works — and where it falls short.</p>
+
+  <p class="section-label">The big picture</p>
+
+  <div class="callout info">
+    <span>ℹ️</span>
+    <span>AI is not one thing — it is an umbrella term covering many different technologies, from simple spam filters to large language models. Understanding the <strong>categories</strong> and <strong>limitations</strong> is essential for responsible use in academic and professional contexts.</span>
+  </div>
+
+  <details class="accordion">
+    <summary>🕰️ History — Why it matters</summary>
+    <div class="accordion-body">
+      <p>The idea of "thinking machines" is over a century old. The term "Artificial Intelligence" was coined in 1956, but the cultural and scientific roots go back further — to Karel Čapek's 1920 play and Alan Turing's 1950 thought experiment. Understanding this timeline helps you see that today's GenAI tools are part of a long evolution, not an overnight revolution.</p>
+    </div>
+  </details>
+
+  <details class="accordion">
+    <summary>🧠 Concepts — How AI is organised</summary>
+    <div class="accordion-body">
+      <p>AI divides broadly into <strong>Narrow (Weak) AI</strong> — systems designed for specific tasks like spam filtering or voice assistants — and the hypothetical <strong>General (Strong) AI</strong>, which would match human-level reasoning across all domains. Generative AI (GenAI), such as ChatGPT, is a subset of Narrow AI: it produces text, images, or code based on pattern prediction, not understanding.</p>
+    </div>
+  </details>
+
+  <details class="accordion">
+    <summary>🎨 Metaphors — Making AI understandable</summary>
+    <div class="accordion-body">
+      <p>Because AI is complex, we rely on metaphors to explain it. Three common ones are: the <strong>Black Box</strong> (we see input and output but not the internal process), the <strong>Iceberg</strong> (the visible interface hides massive data processing), and the <strong>Stochastic Parrot</strong> (the model mimics language patterns without genuine understanding). Each metaphor highlights a different limitation.</p>
+    </div>
+  </details>
+
+  <p class="section-label">Key terms</p>
+
+  <details class="accordion">
+    <summary>📘 Glossary</summary>
+    <div class="accordion-body">
+      <p><strong>Artificial Intelligence (AI)</strong> — The broad field of computer science focused on creating systems that can perform tasks that typically require human intelligence.</p>
+      <p><strong>Narrow / Weak AI</strong> — AI designed for one specific task (e.g., Siri, spam filters, chess engines).</p>
+      <p><strong>General / Strong AI (AGI)</strong> — A hypothetical AI that could perform any intellectual task a human can. This does not yet exist.</p>
+      <p><strong>Generative AI (GenAI)</strong> — AI systems that generate new content (text, images, code) by predicting patterns in training data. Examples: ChatGPT, DALL-E.</p>
+      <p><strong>Turing Test</strong> — A test proposed by Alan Turing in 1950: if a machine can fool a human into thinking it is also human in conversation, it can be said to exhibit intelligent behaviour.</p>
+      <p><strong>Stochastic Parrot</strong> — A metaphor from a 2021 paper by Bender et al., describing large language models as systems that produce fluent-sounding text without genuine comprehension.</p>
+      <p><strong>Black Box</strong> — A metaphor for AI systems whose internal decision-making process is opaque or unexplainable.</p>
+    </div>
+  </details>
+
+  <p class="back-top" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑ Back to top</p>
+</div>
+</div>
+
+
+<!-- ══════════ HISTORY (INTERACTIVE TIMELINE) ══════════ -->
+<div class="tab-panel" id="tab-timeline">
+<div class="container">
+  <p class="section-intro">Click on any event to learn more. This timeline traces the key milestones from the word "robot" entering our vocabulary to the rise of today's generative AI tools.</p>
+
+  <p class="section-label">Interactive timeline</p>
+
+  <div class="timeline" id="timeline">
+
+    <div class="tl-item active" data-index="0">
+      <div class="tl-dot"></div>
+      <div class="tl-year">1920</div>
+      <div class="tl-title">Karel Čapek coins "Robot"</div>
+      <div class="tl-detail">
+        <div class="tl-detail-inner">
+          Czech playwright Karel Čapek introduced the word "robot" (from the Czech <em>robota</em>, meaning forced labour) in his play <em>R.U.R. (Rossum's Universal Robots)</em>. The play imagined artificial workers, laying the cultural groundwork for discussions about artificial beings and machine labour.
+        </div>
+      </div>
+    </div>
+
+    <div class="tl-item" data-index="1">
+      <div class="tl-dot"></div>
+      <div class="tl-year">1950</div>
+      <div class="tl-title">Alan Turing's "Imitation Game"</div>
+      <div class="tl-detail">
+        <div class="tl-detail-inner">
+          In his landmark paper "Computing Machinery and Intelligence," Alan Turing proposed the Imitation Game (now called the Turing Test) as a way to evaluate whether a machine can exhibit intelligent behaviour indistinguishable from a human. He asked: "Can machines think?" — a question that still frames AI research today.
+        </div>
+      </div>
+    </div>
+
+    <div class="tl-item" data-index="2">
+      <div class="tl-dot"></div>
+      <div class="tl-year">1956</div>
+      <div class="tl-title">Dartmouth Conference — "AI" is born</div>
+      <div class="tl-detail">
+        <div class="tl-detail-inner">
+          The Dartmouth Summer Research Project on Artificial Intelligence, organised by John McCarthy, Marvin Minsky, Nathaniel Rochester, and Claude Shannon, officially coined the term "Artificial Intelligence." This workshop is widely considered the founding moment of AI as a field of study. The proposal boldly stated that "every aspect of learning or any other feature of intelligence can in principle be so precisely described that a machine can be made to simulate it."
+        </div>
+      </div>
+    </div>
+
+    <div class="tl-item" data-index="3">
+      <div class="tl-dot"></div>
+      <div class="tl-year">1966</div>
+      <div class="tl-title">ELIZA — the first chatbot</div>
+      <div class="tl-detail">
+        <div class="tl-detail-inner">
+          Joseph Weizenbaum at MIT created ELIZA, a program that used simple pattern matching to simulate a Rogerian psychotherapist. Users often attributed human-like understanding to ELIZA despite its rudimentary design — an early example of the "ELIZA effect," where people project intelligence onto machines.
+        </div>
+      </div>
+    </div>
+
+    <div class="tl-item" data-index="4">
+      <div class="tl-dot"></div>
+      <div class="tl-year">1997</div>
+      <div class="tl-title">Deep Blue beats Kasparov</div>
+      <div class="tl-detail">
+        <div class="tl-detail-inner">
+          IBM's Deep Blue defeated world chess champion Garry Kasparov — a landmark for Narrow AI. Deep Blue could evaluate 200 million positions per second, but it had no understanding of chess strategy in a human sense. It was a brute-force specialist, not a general thinker.
+        </div>
+      </div>
+    </div>
+
+    <div class="tl-item" data-index="5">
+      <div class="tl-dot"></div>
+      <div class="tl-year">2011</div>
+      <div class="tl-title">Siri &amp; the age of virtual assistants</div>
+      <div class="tl-detail">
+        <div class="tl-detail-inner">
+          Apple launched Siri, bringing Narrow AI into millions of pockets. Siri uses natural language processing to interpret voice commands and perform specific tasks — setting alarms, sending messages, searching the web. It popularised the idea of AI as a daily tool, though its capabilities remain firmly in the Narrow AI category.
+        </div>
+      </div>
+    </div>
+
+    <div class="tl-item" data-index="6">
+      <div class="tl-dot"></div>
+      <div class="tl-year">2017</div>
+      <div class="tl-title">The Transformer architecture</div>
+      <div class="tl-detail">
+        <div class="tl-detail-inner">
+          Google researchers published "Attention Is All You Need," introducing the Transformer architecture. This innovation — based on a mechanism called self-attention — made it possible to train much larger language models more efficiently. Transformers underpin virtually all modern GenAI models including GPT, Claude, and Gemini.
+        </div>
+      </div>
+    </div>
+
+    <div class="tl-item" data-index="7">
+      <div class="tl-dot"></div>
+      <div class="tl-year">2022–Present</div>
+      <div class="tl-title">Rise of Generative AI</div>
+      <div class="tl-detail">
+        <div class="tl-detail-inner">
+          The release of ChatGPT in November 2022 brought GenAI into mainstream awareness. These tools — built on large language models — generate text, images, and code by predicting the most likely next token based on patterns in their training data. They are powerful Narrow AI tools, but they do not "understand" content the way humans do. This distinction is critical for responsible academic use.
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="callout tip" style="margin-top:12px;">
+    <span>💡</span>
+    <span>Notice how the timeline moves from <strong>imagination</strong> (fiction, thought experiments) to <strong>formalisation</strong> (academic research) to <strong>application</strong> (consumer products). AI's development mirrors this pattern repeatedly.</span>
+  </div>
+
+  <p class="back-top" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑ Back to top</p>
+</div>
+</div>
+
+
+<!-- ══════════ CONCEPTS ══════════ -->
+<div class="tab-panel" id="tab-concepts">
+<div class="container">
+  <p class="section-intro">AI is an umbrella term. Understanding how the field is organised helps you identify what a specific tool can — and cannot — do.</p>
+
+  <p class="section-label">The AI hierarchy</p>
+
+  <!-- Visual umbrella diagram -->
+  <div class="umbrella-diagram">
+    <div class="umbrella-top">☂️ &nbsp;Artificial Intelligence (AI)</div>
+    <div class="umbrella-stem"></div>
+    <div class="umbrella-branches">
+      <div class="branch-box narrow">
+        <h4>Narrow / Weak AI</h4>
+        <p>Specialised tasks</p>
+      </div>
+      <div class="branch-box general">
+        <h4>General / Strong AI</h4>
+        <p>Hypothetical human-level</p>
+      </div>
+    </div>
+    <div style="margin-top:12px;">
+      <div class="branch-box genai-branch" style="display:inline-block;">
+        <h4>↳ Generative AI</h4>
+        <p>Subset of Narrow AI — pattern prediction</p>
+      </div>
+    </div>
+  </div>
+
+  <p class="section-label">Categories explained</p>
+
+  <div class="concept-grid">
+
+    <div class="concept-card narrow">
+      <h3>🔧 Narrow / Weak AI</h3>
+      <p>Designed and trained for <strong>one specific task</strong>. It excels within its domain but cannot transfer knowledge to other tasks.</p>
+      <div class="example-list">Examples: Siri, spam filters, chess engines, recommendation algorithms, image recognition</div>
+    </div>
+
+    <div class="concept-card general">
+      <h3>🧪 General / Strong AI (AGI)</h3>
+      <p>A <strong>hypothetical</strong> system with human-level reasoning across all domains — learning, planning, and problem-solving in any context. This does not currently exist.</p>
+      <div class="example-list">Status: Theoretical — no working example exists as of 2025</div>
+    </div>
+
+    <div class="concept-card genai">
+      <h3>⚡ Generative AI (GenAI)</h3>
+      <p>A subset of Narrow AI that <strong>generates new content</strong> — text, images, code, audio — by predicting patterns in training data. It does not "understand" in the human sense.</p>
+      <div class="example-list">Examples: ChatGPT, Claude, DALL-E, Midjourney, GitHub Copilot</div>
+    </div>
+
+    <div class="concept-card">
+      <h3>📊 Key distinction</h3>
+      <p>GenAI tools feel intelligent because they produce fluent output, but they operate through <strong>statistical pattern matching</strong>, not comprehension. Recognising this gap is fundamental to using these tools critically and responsibly.</p>
+      <div class="example-list">Pattern prediction ≠ understanding</div>
+    </div>
+
+  </div>
+
+  <div class="callout warn">
+    <span>⚠️</span>
+    <span><strong>Common misconception:</strong> "ChatGPT is Strong AI." It is not. ChatGPT and similar tools are sophisticated Narrow AI. They are trained on specific data to perform specific tasks (generating text). They cannot reason about novel problems outside their training distribution.</span>
+  </div>
+
+  <p class="back-top" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑ Back to top</p>
+</div>
+</div>
+
+
+<!-- ══════════ METAPHORS ══════════ -->
+<div class="tab-panel" id="tab-metaphors">
+<div class="container">
+  <p class="section-intro">Metaphors help us explain complex AI systems to non-specialist audiences. Each one highlights a different limitation or characteristic. Understanding these metaphors makes you a more critical user of AI tools.</p>
+
+  <p class="section-label">Three key metaphors</p>
+
+  <div class="metaphor-grid">
+
+    <div class="metaphor-card">
+      <div class="metaphor-icon">📦</div>
+      <div>
+        <div class="metaphor-subtitle">Lack of transparency</div>
+        <h3>The Black Box</h3>
+        <p>You put data in, you get results out — but the process in between is opaque. Many AI models, especially deep neural networks, make decisions that even their creators cannot fully explain. This raises questions about <strong>accountability</strong> and <strong>trust</strong>, particularly in high-stakes domains like medicine, law, and hiring.</p>
+        <div class="callout tip" style="margin-top:10px;">
+          <span>💡</span>
+          <span><strong>Why it matters:</strong> If you cannot explain <em>how</em> an AI reached a conclusion, how can you evaluate whether it is right?</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="metaphor-card">
+      <div class="metaphor-icon">🧊</div>
+      <div>
+        <div class="metaphor-subtitle">Hidden complexity</div>
+        <h3>The Iceberg</h3>
+        <p>The user interface — the chat window, the prompt box — is just the tip. Below the surface lies an enormous infrastructure: billions of parameters, terabytes of training data, massive compute clusters, and complex preprocessing pipelines. What looks simple on the surface is the product of <strong>immense engineering and data</strong>.</p>
+        <div class="callout tip" style="margin-top:10px;">
+          <span>💡</span>
+          <span><strong>Why it matters:</strong> Simple-looking tools have massive environmental, economic, and ethical footprints hidden beneath the interface.</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="metaphor-card">
+      <div class="metaphor-icon">🦜</div>
+      <div>
+        <div class="metaphor-subtitle">Mimicry without understanding</div>
+        <h3>The Stochastic Parrot</h3>
+        <p>Coined by Emily Bender, Timnit Gebru, and colleagues in a 2021 paper, this metaphor describes large language models as systems that produce fluent text by stitching together statistical patterns — like a parrot that can mimic speech without understanding it. The output <em>sounds</em> meaningful but is generated without any genuine comprehension of the content.</p>
+        <div class="callout warn" style="margin-top:10px;">
+          <span>⚠️</span>
+          <span><strong>Critical implication:</strong> Fluency is not a reliable signal of accuracy. Always verify AI-generated claims against credible sources.</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <p class="section-label">Comparing the metaphors</p>
+
+  <table style="width:100%;border-collapse:collapse;font-size:13px;margin:10px 0;">
+    <thead>
+      <tr style="background:var(--gray-100);">
+        <th style="padding:8px 12px;text-align:left;font-weight:600;color:var(--gray-700);border-bottom:2px solid var(--gray-200);">Metaphor</th>
+        <th style="padding:8px 12px;text-align:left;font-weight:600;color:var(--gray-700);border-bottom:2px solid var(--gray-200);">Highlights</th>
+        <th style="padding:8px 12px;text-align:left;font-weight:600;color:var(--gray-700);border-bottom:2px solid var(--gray-200);">Key question</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td style="padding:8px 12px;border-bottom:1px solid var(--gray-100);">📦 Black Box</td><td style="padding:8px 12px;border-bottom:1px solid var(--gray-100);">Opacity of decision-making</td><td style="padding:8px 12px;border-bottom:1px solid var(--gray-100);font-style:italic;">Can you explain <em>why</em> the AI said that?</td></tr>
+      <tr><td style="padding:8px 12px;border-bottom:1px solid var(--gray-100);">🧊 Iceberg</td><td style="padding:8px 12px;border-bottom:1px solid var(--gray-100);">Hidden infrastructure and cost</td><td style="padding:8px 12px;border-bottom:1px solid var(--gray-100);font-style:italic;">What resources are hidden beneath the simple interface?</td></tr>
+      <tr><td style="padding:8px 12px;">🦜 Stochastic Parrot</td><td style="padding:8px 12px;">Fluency without comprehension</td><td style="padding:8px 12px;font-style:italic;">Does the AI actually <em>understand</em> what it is saying?</td></tr>
+    </tbody>
+  </table>
+
+  <p class="back-top" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑ Back to top</p>
+</div>
+</div>
+
+
+<!-- ══════════ QUIZ ══════════ -->
+<div class="tab-panel" id="tab-quiz">
+<div class="container">
+  <p class="section-intro">Test your understanding of AI fundamentals. Select the best answer for each question.</p>
+
+  <p class="section-label">Quiz</p>
+
+  <div id="quiz-container">
+
+    <div class="quiz-question" data-correct="1">
+      <h3>1. Who coined the word "robot"?</h3>
+      <div class="quiz-options">
+        <button class="quiz-option" data-index="0">Alan Turing</button>
+        <button class="quiz-option" data-index="1">Karel Čapek</button>
+        <button class="quiz-option" data-index="2">John McCarthy</button>
+        <button class="quiz-option" data-index="3">Joseph Weizenbaum</button>
+      </div>
+      <div class="quiz-feedback"></div>
+    </div>
+
+    <div class="quiz-question" data-correct="2">
+      <h3>2. What was the significance of the 1956 Dartmouth Conference?</h3>
+      <div class="quiz-options">
+        <button class="quiz-option" data-index="0">It introduced the Turing Test</button>
+        <button class="quiz-option" data-index="1">It launched the first chatbot</button>
+        <button class="quiz-option" data-index="2">It coined the term "Artificial Intelligence"</button>
+        <button class="quiz-option" data-index="3">It demonstrated Deep Blue</button>
+      </div>
+      <div class="quiz-feedback"></div>
+    </div>
+
+    <div class="quiz-question" data-correct="0">
+      <h3>3. Siri, spam filters, and chess engines are examples of:</h3>
+      <div class="quiz-options">
+        <button class="quiz-option" data-index="0">Narrow (Weak) AI</button>
+        <button class="quiz-option" data-index="1">General (Strong) AI</button>
+        <button class="quiz-option" data-index="2">Generative AI</button>
+        <button class="quiz-option" data-index="3">Artificial General Intelligence</button>
+      </div>
+      <div class="quiz-feedback"></div>
+    </div>
+
+    <div class="quiz-question" data-correct="3">
+      <h3>4. What does the "Stochastic Parrot" metaphor describe?</h3>
+      <div class="quiz-options">
+        <button class="quiz-option" data-index="0">AI that can only process images of birds</button>
+        <button class="quiz-option" data-index="1">AI that learns by observing real parrots</button>
+        <button class="quiz-option" data-index="2">AI that makes random decisions</button>
+        <button class="quiz-option" data-index="3">AI that mimics language patterns without genuine understanding</button>
+      </div>
+      <div class="quiz-feedback"></div>
+    </div>
+
+    <div class="quiz-question" data-correct="1">
+      <h3>5. The "Black Box" metaphor highlights which AI limitation?</h3>
+      <div class="quiz-options">
+        <button class="quiz-option" data-index="0">AI is physically stored in black boxes</button>
+        <button class="quiz-option" data-index="1">The internal decision-making process is opaque</button>
+        <button class="quiz-option" data-index="2">AI only works in dark mode</button>
+        <button class="quiz-option" data-index="3">AI cannot process colour images</button>
+      </div>
+      <div class="quiz-feedback"></div>
+    </div>
+
+    <div class="quiz-question" data-correct="2">
+      <h3>6. Generative AI (e.g., ChatGPT) produces text by:</h3>
+      <div class="quiz-options">
+        <button class="quiz-option" data-index="0">Searching the internet in real time</button>
+        <button class="quiz-option" data-index="1">Understanding and reasoning about meaning</button>
+        <button class="quiz-option" data-index="2">Predicting the most likely next token based on patterns in training data</button>
+        <button class="quiz-option" data-index="3">Copying and pasting from a database of pre-written answers</button>
+      </div>
+      <div class="quiz-feedback"></div>
+    </div>
+
+    <div class="quiz-question" data-correct="0">
+      <h3>7. The "Iceberg" metaphor emphasises that:</h3>
+      <div class="quiz-options">
+        <button class="quiz-option" data-index="0">The visible interface hides massive data processing and infrastructure</button>
+        <button class="quiz-option" data-index="1">AI will eventually sink like the Titanic</button>
+        <button class="quiz-option" data-index="2">AI works better in cold environments</button>
+        <button class="quiz-option" data-index="3">Most AI research happens in Antarctica</button>
+      </div>
+      <div class="quiz-feedback"></div>
+    </div>
+
+    <div class="quiz-question" data-correct="3">
+      <h3>8. Which of the following statements about General (Strong) AI is correct?</h3>
+      <div class="quiz-options">
+        <button class="quiz-option" data-index="0">It already exists in tools like ChatGPT</button>
+        <button class="quiz-option" data-index="1">It was achieved by Deep Blue in 1997</button>
+        <button class="quiz-option" data-index="2">It only requires faster computers to become reality</button>
+        <button class="quiz-option" data-index="3">It is hypothetical and does not currently exist</button>
+      </div>
+      <div class="quiz-feedback"></div>
+    </div>
+
+  </div>
+
+  <div class="quiz-score" id="quiz-score" style="display:none;">
+    <div class="score-number" id="score-display">0 / 8</div>
+    <div class="score-label">Questions answered correctly</div>
+    <button class="reset-btn" onclick="resetQuiz()">Try Again</button>
+  </div>
+
+  <p class="back-top" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑ Back to top</p>
+</div>
+</div>
+
+
+<!-- ══════════ SOURCES ══════════ -->
+<div class="tab-panel" id="tab-sources">
+<div class="container">
+  <p class="section-intro">Sources and further reading on AI history, concepts, and metaphors.</p>
+
+  <details class="accordion" open>
+    <summary>📚 Turing, A. M. (1950) — Computing Machinery and Intelligence</summary>
+    <div class="accordion-body">
+      <a class="source-link" href="https://doi.org/10.1093/mind/LIX.236.433" target="_blank">doi.org/10.1093/mind/LIX.236.433</a>
+      <p>The foundational paper proposing the "Imitation Game" (Turing Test) as a framework for evaluating machine intelligence. Published in <em>Mind</em>, Vol. 59, No. 236.</p>
+    </div>
+  </details>
+
+  <details class="accordion">
+    <summary>📚 McCarthy, J. et al. (1955) — A Proposal for the Dartmouth Summer Research Project on Artificial Intelligence</summary>
+    <div class="accordion-body">
+      <a class="source-link" href="http://jmc.stanford.edu/articles/dartmouth/dartmouth.pdf" target="_blank">jmc.stanford.edu — Dartmouth Proposal (PDF)</a>
+      <p>The original proposal that led to the 1956 Dartmouth Conference, coining the term "Artificial Intelligence." Authors: John McCarthy, Marvin Minsky, Nathaniel Rochester, Claude Shannon.</p>
+    </div>
+  </details>
+
+  <details class="accordion">
+    <summary>📚 Britannica — Artificial Intelligence (AI)</summary>
+    <div class="accordion-body">
+      <a class="source-link" href="https://www.britannica.com/technology/artificial-intelligence" target="_blank">britannica.com — Artificial Intelligence</a>
+      <p>Comprehensive encyclopaedia entry covering AI definitions, categories (narrow vs. general AI), key applications, and foundational concepts. Written and reviewed by B.J. Copeland.</p>
+    </div>
+  </details>
+
+  <details class="accordion">
+    <summary>📚 Britannica — History of Artificial Intelligence</summary>
+    <div class="accordion-body">
+      <a class="source-link" href="https://www.britannica.com/science/history-of-artificial-intelligence" target="_blank">britannica.com — History of Artificial Intelligence</a>
+      <p>Detailed survey of key events and figures in AI history, from Alan Turing's early theoretical work through the Dartmouth Conference, expert systems, connectionism, and modern deep learning. Written by B.J. Copeland.</p>
+    </div>
+  </details>
+
+  <details class="accordion">
+    <summary>📚 Čapek, K. (1920) — R.U.R. (Rossum's Universal Robots)</summary>
+    <div class="accordion-body">
+      <a class="source-link" href="https://en.wikipedia.org/wiki/R.U.R." target="_blank">Wikipedia — R.U.R.</a>
+      <p>The Czech science fiction play that introduced the word "robot" to the world. First performed in Prague in 1921.</p>
+    </div>
+  </details>
+
+  <p class="back-top" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑ Back to top</p>
+</div>
+</div>
+
+
+<!-- FOOTER -->
+<footer class="page-footer">
+  AI: History, Concepts &amp; Metaphors &nbsp;·&nbsp;
+  <a href="https://www.linkedin.com/in/hagu1/" target="_blank">Hamid Guedra</a> &nbsp;·&nbsp;
+  <a href="https://lab.fi/en" target="_blank">LAB University of Applied Sciences</a>
+</footer>
+
+<script>
+// Tab switching
+document.querySelectorAll('.tab-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('tab-' + btn.dataset.tab).classList.add('active');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+});
+
+// Interactive timeline
+document.querySelectorAll('.tl-item').forEach(item => {
+  item.addEventListener('click', () => {
+    const wasActive = item.classList.contains('active');
+    document.querySelectorAll('.tl-item').forEach(i => i.classList.remove('active'));
+    if (!wasActive) item.classList.add('active');
+  });
+});
+
+// Quiz logic
+const feedbackMap = {
+  0: { correct: "Correct! Karel Čapek introduced the word 'robot' in his 1920 play R.U.R.", incorrect: "Not quite. The word 'robot' comes from Karel Čapek's 1920 play R.U.R. (Rossum's Universal Robots)." },
+  1: { correct: "Correct! The 1956 Dartmouth Conference is where the term 'Artificial Intelligence' was officially coined.", incorrect: "Not quite. The Dartmouth Conference (1956) is where John McCarthy and colleagues coined the term 'Artificial Intelligence.'" },
+  2: { correct: "Correct! These are all examples of Narrow AI — systems designed for specific tasks.", incorrect: "Not quite. Siri, spam filters, and chess engines are all Narrow (Weak) AI — each designed for one specific task." },
+  3: { correct: "Correct! The Stochastic Parrot metaphor describes AI that mimics language patterns without genuine understanding.", incorrect: "Not quite. The Stochastic Parrot (Bender et al., 2021) describes how LLMs produce fluent text by stitching together statistical patterns, without understanding." },
+  4: { correct: "Correct! The Black Box metaphor highlights the opacity of AI decision-making processes.", incorrect: "Not quite. The Black Box metaphor refers to the fact that we cannot see or explain how AI systems reach their decisions internally." },
+  5: { correct: "Correct! GenAI generates text through statistical pattern prediction — predicting the most likely next token.", incorrect: "Not quite. GenAI works by predicting the most likely next token based on patterns learned from training data." },
+  6: { correct: "Correct! The Iceberg metaphor highlights the massive hidden infrastructure behind the simple user interface.", incorrect: "Not quite. The Iceberg metaphor shows that the simple chat interface hides billions of parameters, terabytes of data, and massive compute resources." },
+  7: { correct: "Correct! General (Strong) AI is still hypothetical — no working example exists today.", incorrect: "Not quite. General (Strong) AI remains hypothetical. Current systems, including ChatGPT, are sophisticated Narrow AI." }
+};
+
+let answered = 0;
+let score = 0;
+const totalQuestions = document.querySelectorAll('.quiz-question').length;
+
+document.querySelectorAll('.quiz-question').forEach((q, qIndex) => {
+  const correctIndex = parseInt(q.dataset.correct);
+  const options = q.querySelectorAll('.quiz-option');
+  const feedback = q.querySelector('.quiz-feedback');
+
+  options.forEach(opt => {
+    opt.addEventListener('click', () => {
+      if (q.dataset.answered) return;
+      q.dataset.answered = 'true';
+      answered++;
+
+      const selected = parseInt(opt.dataset.index);
+      const isCorrect = selected === correctIndex;
+
+      if (isCorrect) {
+        score++;
+        opt.classList.add('correct');
+        feedback.className = 'quiz-feedback show correct-fb';
+        feedback.textContent = feedbackMap[qIndex].correct;
+      } else {
+        opt.classList.add('incorrect');
+        opt.classList.add('shake');
+        setTimeout(() => opt.classList.remove('shake'), 400);
+        options[correctIndex].classList.add('correct');
+        feedback.className = 'quiz-feedback show incorrect-fb';
+        feedback.textContent = feedbackMap[qIndex].incorrect;
+      }
+
+      options.forEach(o => o.classList.add('disabled'));
+
+      if (answered === totalQuestions) {
+        const scoreEl = document.getElementById('quiz-score');
+        scoreEl.style.display = 'block';
+        document.getElementById('score-display').textContent = score + ' / ' + totalQuestions;
+      }
+    });
+  });
+});
+
+function resetQuiz() {
+  answered = 0;
+  score = 0;
+  document.querySelectorAll('.quiz-question').forEach(q => {
+    delete q.dataset.answered;
+    q.querySelectorAll('.quiz-option').forEach(o => {
+      o.classList.remove('correct', 'incorrect', 'disabled', 'shake');
+    });
+    const fb = q.querySelector('.quiz-feedback');
+    fb.className = 'quiz-feedback';
+    fb.textContent = '';
+  });
+  document.getElementById('quiz-score').style.display = 'none';
+}
+</script>
+</body>
+</html>
